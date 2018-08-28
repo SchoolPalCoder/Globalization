@@ -49,16 +49,10 @@ Router.get('/moduleList', api.getModuleList)
 Router.get('/export', api.export)
 Router.post('/syncData', api.syncData)
 Router.post('/data', api.getData)
-<<<<<<< HEAD
 Router.post('/getTransTotalList', api.getTransTotalList)
-app
-    .use(Router.routes())
-    .use(Router.allowedMethods());
-=======
 Router.post('/save', api.save)
 Router.post('/enable', api.enable)
 app.use(Router.routes(), Router.allowedMethods())
->>>>>>> master
 // app.all('*', function (req, res, next) {
 //     res.header("Access-Control-Allow-Origin", "*");
 //     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
