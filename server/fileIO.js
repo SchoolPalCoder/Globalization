@@ -4,6 +4,7 @@
 const trans = require('./db')
 var fs = require('fs')
 const utils = require('./utils')
+//同步数据时读文件
 async function readFile(_path, branch = 'master') {
     var cnRes = fs.readFileSync(_path + "/lang.cn.js")
     try {
@@ -50,6 +51,7 @@ async function readFile(_path, branch = 'master') {
 
 
 }
+//导出时写文件
 function writeFile(_path, src) {
     fs.openSync(_path, 'a')//a代表不存在的时候就新建
     fs.writeFileSync(_path, src)

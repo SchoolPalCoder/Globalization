@@ -11,8 +11,15 @@ import MultiTable from '../table/table';
 
 class App extends Component {
   _this = this
-  state = { list: [], totalCount: 0, branchList: [], moduleList: [], selectByBranch: true, defaultBranch: '', docType: true }
+  state = { list: [], totalCount: 0, branchList: [], moduleList: [], selectByBranch: true, defaultBranch: '', docType: true, currentUser: {} }
   componentDidMount() {
+    //获取登录人
+    axios.get('/getCurrentUser').then(res => {
+      this.setState({
+        currentUser: res
+      })
+    })
+    //获取分支列表
     axios.get('/branchList').then(data => {
       this.setState({
         branchList: data,
@@ -24,6 +31,7 @@ class App extends Component {
     }).then(() => {
       this.getData(this.searchParam)
     })
+    //获取模块列表
     axios.get('/moduleList').then(data => {
       this.setState({
         moduleList: data
@@ -147,12 +155,11 @@ class App extends Component {
         </div>
         <div style={{ padding: '20px' }}>
           <Card
-
-            style={{ width: '100%' }}
+            style={{ width: '100%', height: 240, overflow: 'auto' }}
             cover={<img alt="1" src="http://ok0nex8hq.bkt.clouddn.com/1533051037.png" />}
           ></Card>
         </div>
-        <MultiTable list={this.state.list} count={this.state.totalCount} fresh={() => this.refresh()} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable>
+        <MultiTable list={this.state.list} user={this.state.currentUser} count={this.state.totalCount} fresh={() => this.refresh()} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable>
       </div>
     )
   }

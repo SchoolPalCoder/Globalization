@@ -15,12 +15,9 @@ class Login extends React.Component {
     }
     //登录
     login() {
-        axios.get('/login', {
-            params:
-            {
-                name: this.state.username,
-                password: this.state.password
-            }
+        axios.post('/login', {
+            name: this.state.username,
+            password: this.state.password
         }
         ).then(res => {
 

@@ -4,14 +4,16 @@
 const Koa = require('koa');
 const Router = require('koa-router')()
 const bodyParser = require('koa-bodyparser')
-// var bodyParser = require('body-parser')
 const session = require('koa-session')
-
+// const staticCache = require('koa-static-cache')
+//
+// const static = require('koa-static')
+const path = require('path')
 const api = require('./api')
-console.log(api);
+const { MIMES } = require('./utils')
+const fs = require('fs')
 var app = new Koa();
 app.keys = ['some secret hurr'];
-
 const CONFIG = {
     key: 'koa:sessuu', /** (string) cookie key (default is koa:sess) */
     /** (number || 'session') maxAge in ms (default is 1 days) */
@@ -30,19 +32,20 @@ app.use(session(CONFIG, app));
 
 app.use(async (ctx, next) => {
     // ignore favicon
-    if (ctx.path === '/favicon.ico') return;
+    // if (ctx.path === '/favicon.ico') return;
     await next()
-
+    //鉴权
     if (!ctx.session.name) {
         ctx.throw(401, 'login please')
         // ctx.response.body = { to: 'login' }
     }
     // ctx.body = n + ' views';
 });
+
 var host = '127.0.0.1';
 var port = 9090;
 app.use(bodyParser())
-Router.get('/login', api.login)
+Router.post('/login', api.login)
 
 Router.get('/branchList', api.getBranchList)
 Router.get('/moduleList', api.getModuleList)
@@ -52,6 +55,31 @@ Router.post('/data', api.getData)
 Router.post('/getTransTotalList', api.getTransTotalList)
 Router.post('/save', api.save)
 Router.post('/enable', api.enable)
+Router.get('/getCurrentUser', api.getCurrentUser)
+// 解析资源类型
+function parseMime(url) {
+    let extName = path.extname(url)
+    extName = extName ? extName.slice(1) : 'unknown'
+    return MIMES[extName]
+}
+var prdEnv = process.env.NODE_ENV === 'production'
+//生产环境中，除了api之外还需要提供静态资源
+if (prdEnv) {
+    //这里下面的两个读文件的操作，貌似可以直接用ctx.sendFile()代替
+    Router.get('/*', async (ctx, next) => {
+
+        if (parseMime(ctx.url) === 'unknown') {
+            // if (ctx.url === '/') {
+            ctx.type = 'text/html'
+            ctx.response.body = fs.readFileSync(path.join(__dirname, '../build/index.html'), 'binary')
+        } else {
+            ctx.type = parseMime(ctx.url)
+            ctx.response.body = fs.readFileSync(path.join(__dirname, '../build/', ctx.url))
+        }
+    })
+    // app.use(static('.'))
+}
+
 app.use(Router.routes(), Router.allowedMethods())
 // app.all('*', function (req, res, next) {
 //     res.header("Access-Control-Allow-Origin", "*");
@@ -64,7 +92,9 @@ app.use(Router.routes(), Router.allowedMethods())
 // app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(bodyParser.json());
 
-
+app.on('error', err => {
+    console.error('server error', err)
+});
 app.listen(port, host, function (req, res) {
     console.log(`running at ${port}`);
 })
