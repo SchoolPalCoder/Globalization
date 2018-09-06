@@ -46,10 +46,14 @@ body {
   flex-wrap: wrap;
   flex-direction: column;
   align-items: center;
-
+  background-image: url(./bg-01.jpg);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
 
   padding: 70px 15px 74px 15px;
+}
+.inputArea{
+  width:140px;
+  margin-left:15px;
 }
