@@ -16,18 +16,23 @@ let option = {
         }
         let count,
             piplineArr = [
+
+                { $match: { name: { $ne: null } } },
                 {
                     $group: {
-                        _id: "$identifer",
+                        _id: { name: "$name", eName: "$eName", identifer: "$identifer" },
                         total: { $sum: 1 },
-                        pathArr: { $push: "$location" },
-                        eName: { $first: "$eName" },
-                        name: { $first: "$name" },
+                        pathArr: { $push: { location: "$location", identifer: "$identifer", key: "$_id" } },
+                        key: { $first: "$_id" },
                     }
                 },
 
-            ],
-            tempList = await trans.aggregate(piplineArr);
+            ];
+        if (key) {
+            piplineArr[0] = { $match: { $or: [{ name: new RegExp(key) }, { eName: new RegExp(key) }] } }
+        }
+        let tempList = await trans.aggregate(piplineArr);
+
         count = tempList.length;
         piplineArr = piplineArr.concat([
             { $sort: { total: -1 } }

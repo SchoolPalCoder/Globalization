@@ -5,13 +5,24 @@ import './App.css';
 import { Layout, Tabs, Icon, Divider, Upload, Input, Select, Pagination, Radio, Menu, Button, Card } from 'antd'
 import axios from '../net'
 import MultiTable from '../table/table';
+import TotalTrans from "../totalTrans";
 
 
 
 
 class App extends Component {
   _this = this
-  state = { list: [], totalCount: 0, branchList: [], moduleList: [], selectByBranch: true, defaultBranch: '', docType: true, currentUser: {} }
+  state = {
+    list: [],
+    totalCount: 0,
+    branchList: [],
+    moduleList: [],
+    selectByBranch: true,
+    defaultBranch: '',
+    docType: true,
+    transAllFilter: {},
+    currentUser: {},
+  }
   componentDidMount() {
     //获取登录人
     axios.get('/getCurrentUser').then(res => {
@@ -137,13 +148,19 @@ class App extends Component {
               </Select>
             </Radio.Group> :
             <div>
-              <Select style={{ width: 120, display: 'inline-block' }} defaultValue="全部" onSelect={(val) => { this.searchParam.state = val === 0 ? '' : val === 1 ? false : true; this.getData(this.searchParam); }}>
+              <Select style={{ width: 120, display: 'inline-block' }} defaultValue="全部" onSelect={(val) => {
+                let transAllFilter = Object.assign(this.state.transAllFilter, { type: val === '0' ? '' : (val === '1' ? false : true) });
+                this.setState({ transAllFilter })
+              }}>
                 <Select.Option key='0'>全部</Select.Option>
                 <Select.Option key='1'>未生效</Select.Option>
                 <Select.Option key='2'>已生效</Select.Option>
 
               </Select>
-              <Input.Search enterButton style={{ width: 260, marginLeft: 30 }} onSearch={value => { this.searchParam.key = value; this.getData(this.searchParam) }}></Input.Search>
+              <Input.Search enterButton style={{ width: 260, marginLeft: 30 }} onSearch={value => {
+                this.setState({ transAllFilter: Object.assign(this.state.transAllFilter, { key: value }) }
+                )
+              }}></Input.Search>
             </div>
           }
         </div>
@@ -153,13 +170,22 @@ class App extends Component {
           <Button style={{ float: 'right' }} onClick={() => this.export()}>导出</Button>
           <Button onClick={this.syncData.bind(this)} style={{ float: 'right', marginRight: '10px' }}>同步数据</Button>
         </div>
-        <div style={{ padding: '20px' }}>
-          <Card
-            style={{ width: '100%', height: 240, overflow: 'auto' }}
-            cover={<img alt="1" src="http://ok0nex8hq.bkt.clouddn.com/1533051037.png" />}
-          ></Card>
-        </div>
-        <MultiTable list={this.state.list} user={this.state.currentUser} count={this.state.totalCount} fresh={() => this.refresh()} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable>
+        {this.state.docType ?
+          <div>
+            <div style={{ padding: '20px' }}>
+              <Card
+
+                style={{ width: '100%', height: 240, overflow: 'auto' }}
+                cover={<img alt="1" src="http://ok0nex8hq.bkt.clouddn.com/1533051037.png" />}
+              ></Card>
+            </div>
+            <MultiTable user={this.state.currentUser} list={this.state.list} count={this.state.totalCount} fresh={() => this.refresh()} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable>
+          </div> :
+          <div>
+            <TotalTrans searchParam={this.state.transAllFilter}></TotalTrans>
+          </div>
+        }
+
       </div>
     )
   }
