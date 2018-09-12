@@ -179,7 +179,7 @@ class App extends Component {
                 cover={<img alt="1" src="http://ok0nex8hq.bkt.clouddn.com/1533051037.png" />}
               ></Card>
             </div>
-            <MultiTable list={this.state.list} count={this.state.totalCount} fresh={() => this.refresh()} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable>
+            <MultiTable user={this.state.currentUser} list={this.state.list} count={this.state.totalCount} fresh={() => this.refresh()} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable>
           </div> :
           <div>
             <TotalTrans searchParam={this.state.transAllFilter}></TotalTrans>
