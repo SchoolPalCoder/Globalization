@@ -119,9 +119,10 @@ class MultiTable extends React.Component {
             <Popconfirm title="确认保存？" onConfirm={() => this.save()}>
                 <Button className="marL15">保存</Button>
             </Popconfirm>
-            <Popconfirm title="确认生效？" onConfirm={() => this.enable()}>
+            {this.props.user.isAdmin ? <Popconfirm title="确认生效？" onConfirm={() => this.enable()}>
                 <Button className="marL15">生效</Button>
-            </Popconfirm>
+            </Popconfirm> : null}
+
         </div>
     }
 }

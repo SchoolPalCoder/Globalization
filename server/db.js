@@ -7,7 +7,6 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'error aaa'));
 db.once('open', () => {
     console.log('ok');
-    console.log(db);
 })
 //双语表
 var transSchema = mongoose.Schema({
@@ -25,13 +24,20 @@ var trans = mongoose.model('Trans', transSchema);
 //用户表
 var userSchema = mongoose.Schema({
     username: String,
-    password: String
+    password: String,
+    isAdmin: Boolean
 })
 var user = mongoose.model('user', userSchema)
-user.create({
-    username: 'admin',
-    password: '123456'
+user.find({}, (err, item) => {
+    if (!item.length) {
+        user.create({
+            username: 'admin',
+            password: '123456',
+            isAdmin: true
+        })
+    }
 })
+
 var fs = require('fs')
 var path = require('path')
 const utils = require('./utils')

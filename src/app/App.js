@@ -21,8 +21,16 @@ class App extends Component {
     defaultBranch: '',
     docType: true,
     transAllFilter: {},
+    currentUser: {},
   }
   componentDidMount() {
+    //获取登录人
+    axios.get('/getCurrentUser').then(res => {
+      this.setState({
+        currentUser: res
+      })
+    })
+    //获取分支列表
     axios.get('/branchList').then(data => {
       this.setState({
         branchList: data,
@@ -34,6 +42,7 @@ class App extends Component {
     }).then(() => {
       this.getData(this.searchParam)
     })
+    //获取模块列表
     axios.get('/moduleList').then(data => {
       this.setState({
         moduleList: data
@@ -166,7 +175,7 @@ class App extends Component {
             <div style={{ padding: '20px' }}>
               <Card
 
-                style={{ width: '100%' }}
+                style={{ width: '100%', height: 240, overflow: 'auto' }}
                 cover={<img alt="1" src="http://ok0nex8hq.bkt.clouddn.com/1533051037.png" />}
               ></Card>
             </div>

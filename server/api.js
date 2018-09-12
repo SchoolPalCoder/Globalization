@@ -3,7 +3,6 @@
 */
 const { trans, user } = require('./db')
 const utils = require('./utils')
-// const session = require('koa-session')
 
 const { readFile, writeFile } = require('./fileIO');
 let option = {
@@ -117,14 +116,22 @@ let option = {
 
         })
     },
+    //获取当前登录人
+    getCurrentUser: async (ctx) => {
+        ctx.response.body = {
+            name: ctx.session.name,
+            isAdmin: ctx.session.isAdmin
+        }
+    },
     //登录
     login: async (ctx) => {
-        let { name, password } = ctx.request.query;
+        let { name, password } = ctx.request.body;
         let loginUser = await user.findOne({ username: name }).exec()
         if (loginUser && loginUser.password === password) {
             ctx.session = {
                 name,
-                password
+                password,
+                isAdmin: loginUser.isAdmin
             }
             ctx.body = true
         }
@@ -186,27 +193,5 @@ let option = {
         })
         ctx.response.body = true
     }
-    //Todo
-    //生效接口（生效）
-    // enable: async (ctx, next) => {
-    //     let req = ctx.request.body.list
-    //     req.map(item => {
-    //         await trans.findByIdAndUpdate(item, { state: 1 }).exec()
-    //     })
-    //     ctx.response.body = true
-    // },
-    // //保存接口（未生效）
-    // save: async (ctx, next) => {
-    //     let req = ctx.request.body.list
-    //     req.map(item => {
-    //         await trans.findByIdAndUpdate(item._id, { eName: item.eName }).exec()
-    //     })
-    //     ctx.response.body = true
-    // }
-    //获取同中文名的情况下，之前的翻译
-    //
-    //
-    //
-    //
 }
 module.exports = option
