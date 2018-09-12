@@ -2,13 +2,30 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 // eslint-disable-next-line
-import { Layout, Tabs, Icon, Divider, Upload, Input, Select, Pagination, Radio, Menu, Button, Card } from 'antd'
+import { Layout, Tabs, Icon, Divider, Upload, Input, Select, Pagination, Radio, Menu, Button, Card, message } from 'antd'
 import axios from './net'
 import MultiTable from './table';
 import TotalTrans from "./totalTrans";
 
+const Dragger = Upload.Dragger
+const fileConfigs = {
+  name: 'file',
+  multiple: true,
+  //后端接口
+  // action: '//jsonplaceholder.typicode.com/posts/',
 
-
+  onChange(info) {
+    const status = info.file.status;
+    if (status !== 'uploading') {
+      console.log(info.file, info.fileList);
+    }
+    if (status === 'done') {
+      message.success(`${info.file.name} file uploaded successfully.`);
+    } else if (status === 'error') {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+  },
+};
 
 class App extends Component {
   _this = this
@@ -119,6 +136,7 @@ class App extends Component {
               {this.state.moduleList.map(item => (<Select.Option key={item} value={item}>{item}</Select.Option>))}
             </Select>
           </Radio.Group>
+          <Dragger {...fileConfigs}></Dragger>
         </div>
         {
           this.state.viewType === "页面翻译" ?
