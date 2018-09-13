@@ -192,6 +192,12 @@ let option = {
             await trans.findByIdAndUpdate(item._id, { eName: item.eName, state: false }).exec()
         })
         ctx.response.body = true
+    },
+    //上传图片
+    upload: async (ctx, next) => {
+        ctx.body = {
+            file: ctx.req.file.filename
+        }
     }
 }
 module.exports = option

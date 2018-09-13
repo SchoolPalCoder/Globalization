@@ -5,10 +5,29 @@ const Koa = require('koa');
 const Router = require('koa-router')()
 const bodyParser = require('koa-bodyparser')
 const session = require('koa-session')
+const utils = require('./utils')
+const path = require('path')
+
+const multer = require('koa-multer')
+//文件上传
+//配置
+var storage = multer.diskStorage({
+    //文件保存路径
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '../build/static/files'))
+    },
+    //修改文件名称
+    filename: function (req, file, cb) {
+        var fileFormat = (file.originalname).split(".");  //以点分割成数组，数组的最后一项就是后缀名
+        cb(null, Date.now() + "." + fileFormat[fileFormat.length - 1]);
+    }
+})
+//加载配置
+
+var upload = multer({ storage });
 // const staticCache = require('koa-static-cache')
 //
 // const static = require('koa-static')
-const path = require('path')
 const api = require('./api')
 const { MIMES } = require('./utils')
 const fs = require('fs')
@@ -56,6 +75,7 @@ Router.post('/getTransTotalList', api.getTransTotalList)
 Router.post('/save', api.save)
 Router.post('/enable', api.enable)
 Router.get('/getCurrentUser', api.getCurrentUser)
+Router.post('/upload', upload.single('file'), api.upload)
 // 解析资源类型
 function parseMime(url) {
     let extName = path.extname(url)
