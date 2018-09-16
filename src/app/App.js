@@ -172,10 +172,15 @@ class App extends Component {
                   {this.state.moduleList.map(item => (<Select.Option key={item} value={item}>{item}</Select.Option>))}
                 </Select>
               </Radio.Group>
-              <Dragger {...fileConfigs} >
-                <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                <p className="ant-upload-hint">Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files</p>
-              </Dragger>
+              <div style={{ width: '80%', margin: '0 auto' }}>
+                <Dragger {...fileConfigs} >
+                  <p className="ant-upload-drag-icon">
+                    <Icon type="inbox" />
+                  </p>
+                  <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                  <p className="ant-upload-hint">Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files</p>
+                </Dragger>
+              </div>
             </div> :
             <div>
               <Select style={{ width: 120, display: 'inline-block' }} defaultValue="全部" onSelect={(val) => {
