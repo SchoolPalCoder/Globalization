@@ -12,7 +12,8 @@ body {
   padding: 15px;
 }
 .loginContainer{
-  width:670px;
+  width:560px;
+  background: #f0f0f0;
   border-radius:10px;
   justify-content: center;
   align-items: center;
@@ -29,6 +30,12 @@ body {
 }
 .marT30{
   margin-top: 30px;
+}
+.marT20{
+  margin-top:20px;
+}
+.marB15{
+  margin-bottom: 15px;
 }
 .alignCenter{
   text-align: center;
