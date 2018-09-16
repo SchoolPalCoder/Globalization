@@ -121,6 +121,18 @@ class App extends Component {
       listType: 'picture',
       //后端接口
       action: '/upload',
+      //以下注释部分可传至公司oss，但是不返回文件路径，而且需要先获取几个token，刷新时间不确定；周六拿到的值，周日还能用于上传
+      // action: 'https://greedyint-qa.oss-cn-hangzhou.aliyuncs.com/',
+      // data: file => {
+      //   let obj = {
+      //     policy: 'eyJleHBpcmF0aW9uIjoiMjAxOC0wOS0xNlQxNDo0MjozMC40OTlaIiwiY29uZGl0aW9ucyI6W1siY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsNTM2ODcwOTEyXV19',
+      //     OSSAccessKeyId: 'q2tKifmsvACmj1oF',
+      //     success_action_status: 200,
+      //     signature: '7hzbU9aDJZYg7tDvG5iUkT4qBOs=',
+      //     key: '1courseplus/sis/upload/file/37/' + file.name
+      //   }
+      //   return obj
+      // },
       onChange: (info) => {
         const status = info.file.status;
         if (status !== 'uploading') {
