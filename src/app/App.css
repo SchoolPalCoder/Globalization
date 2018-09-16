@@ -29,3 +29,7 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+/* 隐藏antd自带的文件上传列表 */
+.ant-upload-list{
+  display: none;
+}

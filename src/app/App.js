@@ -8,24 +8,7 @@ import MultiTable from '../table/table';
 import TotalTrans from "../totalTrans";
 
 const Dragger = Upload.Dragger
-const fileConfigs = {
-  name: 'file',
-  multiple: true,
-  //后端接口
-  action: '/upload',
 
-  onChange(info) {
-    const status = info.file.status;
-    if (status !== 'uploading') {
-      console.log(info.file, info.fileList);
-    }
-    if (status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully.`);
-    } else if (status === 'error') {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-};
 
 
 class App extends Component {
@@ -40,7 +23,9 @@ class App extends Component {
     docType: true,
     transAllFilter: {},
     currentUser: {},
+    picture: ''
   }
+
   componentDidMount() {
     //获取登录人
     axios.get('/getCurrentUser').then(res => {
@@ -129,8 +114,29 @@ class App extends Component {
 
     })
   }
-
   render() {
+    const fileConfigs = {
+      name: 'file',
+      multiple: false,
+      listType: 'picture',
+      //后端接口
+      action: '/upload',
+      onChange: (info) => {
+        const status = info.file.status;
+        if (status !== 'uploading') {
+          console.log(info.file, info.fileList);
+        }
+        if (status === 'done') {
+          message.success(`${info.file.name} file uploaded successfully.`);
+          this.setState({
+            picture: info.file.response.file
+          })
+          console.log(this.state);
+        } else if (status === 'error') {
+          message.error(`${info.file.name} file upload failed.`);
+        }
+      },
+    };
     return (
       <div className="App">
         <header className="App-header">
@@ -166,7 +172,7 @@ class App extends Component {
                   {this.state.moduleList.map(item => (<Select.Option key={item} value={item}>{item}</Select.Option>))}
                 </Select>
               </Radio.Group>
-              <Dragger {...fileConfigs}>
+              <Dragger {...fileConfigs} >
                 <p className="ant-upload-text">Click or drag file to this area to upload</p>
                 <p className="ant-upload-hint">Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files</p>
               </Dragger>
@@ -204,7 +210,7 @@ class App extends Component {
               <Card
 
                 style={{ width: '100%', height: 240, overflow: 'auto' }}
-                cover={<img alt="1" src="http://ok0nex8hq.bkt.clouddn.com/1533051037.png" />}
+                cover={<img alt="相关图片" src={this.state.picture} />}
               ></Card>
             </div>
             <MultiTable user={this.state.currentUser} list={this.state.list} count={this.state.totalCount} fresh={() => this.refresh()} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable>

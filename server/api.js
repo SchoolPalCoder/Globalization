@@ -205,7 +205,7 @@ let option = {
     //上传图片
     upload: async (ctx, next) => {
         ctx.body = {
-            file: ctx.host + '/' + ctx.req.file.filename
+            file: ctx.origin + '/' + ctx.req.file.filename
         }
     },
     //静态资源
