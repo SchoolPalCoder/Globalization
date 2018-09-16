@@ -121,6 +121,9 @@ class App extends Component {
       listType: 'picture',
       //后端接口
       action: '/upload',
+      data: file => ({
+        module: this.searchParam.module
+      }),
       //以下注释部分可传至公司oss，但是不返回文件路径，而且需要先获取几个token，刷新时间不确定；周六拿到的值，周日还能用于上传
       // action: 'https://greedyint-qa.oss-cn-hangzhou.aliyuncs.com/',
       // data: file => {
@@ -184,7 +187,7 @@ class App extends Component {
                   {this.state.moduleList.map(item => (<Select.Option key={item} value={item}>{item}</Select.Option>))}
                 </Select>
               </Radio.Group>
-              <div style={{ width: '80%', margin: '0 auto' }}>
+              {this.state.selectByBranch ? null : <div style={{ width: '80%', margin: '0 auto' }}>
                 <Dragger {...fileConfigs} >
                   <p className="ant-upload-drag-icon">
                     <Icon type="inbox" />
@@ -192,7 +195,8 @@ class App extends Component {
                   <p className="ant-upload-text">Click or drag file to this area to upload</p>
                   <p className="ant-upload-hint">Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files</p>
                 </Dragger>
-              </div>
+              </div>}
+
             </div> :
             <div>
               <Select style={{ width: 120, display: 'inline-block' }} defaultValue="全部" onSelect={(val) => {
@@ -221,7 +225,7 @@ class App extends Component {
           <Button style={{ float: 'right' }} onClick={() => this.export()}>导出</Button>
           <Button onClick={this.syncData.bind(this)} style={{ float: 'right', marginRight: '10px' }}>同步数据</Button>
         </div>
-        {this.state.docType ?
+        {this.state.docType && !this.state.selectByBranch ?
           <div>
             <div style={{ padding: '20px' }}>
               <Card

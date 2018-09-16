@@ -204,8 +204,11 @@ let option = {
     },
     //上传图片
     upload: async (ctx, next) => {
+        const filePath = ctx.origin + '/' + ctx.req.file.filename
+        //todo 数据库中记录模块和文件路径的关系
+        // ctx.req.body.module
         ctx.body = {
-            file: ctx.origin + '/' + ctx.req.file.filename
+            file: filePath
         }
     },
     //静态资源
