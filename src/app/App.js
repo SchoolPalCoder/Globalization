@@ -115,27 +115,30 @@ class App extends Component {
     })
   }
   render() {
+    const ossUrl = 'https://greedyint-qa.oss-cn-hangzhou.aliyuncs.com/'
+    const ossFilePath = '1courseplus/sis/upload/file/37/'
     const fileConfigs = {
       name: 'file',
       multiple: false,
       listType: 'picture',
       //后端接口
-      action: '/upload',
-      data: file => ({
-        module: this.searchParam.module
-      }),
+      // action: '/upload',
+      // data: file => ({
+      //   module: this.searchParam.module
+      // }),
       //以下注释部分可传至公司oss，但是不返回文件路径，而且需要先获取几个token，刷新时间不确定；周六拿到的值，周日还能用于上传
-      // action: 'https://greedyint-qa.oss-cn-hangzhou.aliyuncs.com/',
-      // data: file => {
-      //   let obj = {
-      //     policy: 'eyJleHBpcmF0aW9uIjoiMjAxOC0wOS0xNlQxNDo0MjozMC40OTlaIiwiY29uZGl0aW9ucyI6W1siY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsNTM2ODcwOTEyXV19',
-      //     OSSAccessKeyId: 'q2tKifmsvACmj1oF',
-      //     success_action_status: 200,
-      //     signature: '7hzbU9aDJZYg7tDvG5iUkT4qBOs=',
-      //     key: '1courseplus/sis/upload/file/37/' + file.name
-      //   }
-      //   return obj
-      // },
+      action: ossUrl,
+      data: file => {
+        let obj = {
+          policy: 'eyJleHBpcmF0aW9uIjoiMjAxOC0wOS0xOFQxNzoyNDo0NC40NTJaIiwiY29uZGl0aW9ucyI6W1siY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsNTM2ODcwOTEyXV19',
+          OSSAccessKeyId: 'q2tKifmsvACmj1oF',
+          success_action_status: 200,
+          // signature: '7hzbU9aDJZYg7tDvG5iUkT4qBOs=',
+          signature: 'Q6fYqd6LSn8nVd/hM9uKvO8c2e8=',
+          key: ossFilePath + file.name
+        }
+        return obj
+      },
       onChange: (info) => {
         const status = info.file.status;
         if (status !== 'uploading') {
@@ -144,9 +147,9 @@ class App extends Component {
         if (status === 'done') {
           message.success(`${info.file.name} file uploaded successfully.`);
           this.setState({
-            picture: info.file.response.file
+            picture: ossUrl + ossFilePath + info.file.originFileObj.name
           })
-          console.log(this.state);
+          //调用绑定图片url和模块的接口
         } else if (status === 'error') {
           message.error(`${info.file.name} file upload failed.`);
         }
