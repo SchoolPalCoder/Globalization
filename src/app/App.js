@@ -187,15 +187,7 @@ class App extends Component {
                   {this.state.moduleList.map(item => (<Select.Option key={item} value={item}>{item}</Select.Option>))}
                 </Select>
               </Radio.Group>
-              {this.state.selectByBranch ? null : <div style={{ width: '80%', margin: '0 auto' }}>
-                <Dragger {...fileConfigs} >
-                  <p className="ant-upload-drag-icon">
-                    <Icon type="inbox" />
-                  </p>
-                  <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                  <p className="ant-upload-hint">Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files</p>
-                </Dragger>
-              </div>}
+
 
             </div> :
             <div>
@@ -225,6 +217,16 @@ class App extends Component {
           <Button style={{ float: 'right' }} onClick={() => this.export()}>导出</Button>
           <Button onClick={this.syncData.bind(this)} style={{ float: 'right', marginRight: '10px' }}>同步数据</Button>
         </div>
+        {this.state.selectByBranch ? null :
+          <div style={{ width: '80%', margin: '0 auto' }}>
+            <Dragger {...fileConfigs} >
+              <p className="ant-upload-drag-icon">
+                <Icon type="inbox" />
+              </p>
+              <p className="ant-upload-text">Click or drag file to this area to upload</p>
+              <p className="ant-upload-hint">Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files</p>
+            </Dragger>
+          </div>}
         {this.state.docType && !this.state.selectByBranch ?
           <div>
             <div style={{ padding: '20px' }}>
@@ -234,12 +236,13 @@ class App extends Component {
                 cover={<img alt="相关图片" src={this.state.picture} />}
               ></Card>
             </div>
-            <MultiTable user={this.state.currentUser} list={this.state.list} count={this.state.totalCount} fresh={() => this.refresh()} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable>
-          </div> :
-          <div>
+          </div> : null}
+        {this.state.docType ?
+          <MultiTable user={this.state.currentUser} list={this.state.list} count={this.state.totalCount} fresh={() => this.refresh()} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable>
+          : <div>
             <TotalTrans searchParam={this.state.transAllFilter}></TotalTrans>
           </div>
-        }
+        }}
 
       </div>
     )

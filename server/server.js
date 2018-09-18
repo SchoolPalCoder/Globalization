@@ -9,7 +9,7 @@ const utils = require('./utils')
 const path = require('path')
 const multer = require('koa-multer')
 const api = require('./api')
-const serveStatic=require('koa-static')
+const serveStatic = require('koa-static')
 
 const host = '127.0.0.1';
 const port = 9090;
@@ -52,7 +52,7 @@ app.use(async (ctx, next) => {
         ctx.throw(401, 'login please')
     }
 });
-app.use(serveStatic(path.join(__dirname,'../static')))
+app.use(serveStatic(path.join(__dirname, '../build')))
 app.use(bodyParser())
 Router.post('/login', api.login)
 Router.get('/branchList', api.getBranchList)
@@ -71,14 +71,15 @@ Router.post('/upload', upload.single('file'), api.upload)
 // 2018年09月15日23:07:00补充： 其实服务端不需要区分开发环境和生产环境，开发环境访问的是3000端口，服务端只提供api；生产环境访问9090端口，除api外还提供静态资源，所以直接写成服务端支持提供静态资源即可
 // if (prdEnv) {
 //这里下面的两个读文件的操作，貌似可以直接用ctx.sendFile()代替
-Router.get('/*', api.bundleFile)
+//2018年09月18日22:29:38 自己写提供静态资源的方法已废弃，改用koa-static
+// Router.get('/*', api.bundleFile)
 // app.use(static('.'))
 // }
 
 app.use(Router.routes(), Router.allowedMethods({ throw: true }))
 
 app.on('error', err => {
-    console.error('serveStaticr error', err)
+    console.error('server error', err)
 });
 app.listen(port, host, function (req, res) {
     console.log(`running at ${port}`);
