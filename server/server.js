@@ -9,7 +9,7 @@ const utils = require('./utils')
 const path = require('path')
 const multer = require('koa-multer')
 const api = require('./api')
-
+const serveStatic=require('koa-static')
 
 const host = '127.0.0.1';
 const port = 9090;
@@ -52,6 +52,7 @@ app.use(async (ctx, next) => {
         ctx.throw(401, 'login please')
     }
 });
+app.use(serveStatic(path.join(__dirname,'../static')))
 app.use(bodyParser())
 Router.post('/login', api.login)
 Router.get('/branchList', api.getBranchList)
@@ -77,7 +78,7 @@ Router.get('/*', api.bundleFile)
 app.use(Router.routes(), Router.allowedMethods({ throw: true }))
 
 app.on('error', err => {
-    console.error('server error', err)
+    console.error('serveStaticr error', err)
 });
 app.listen(port, host, function (req, res) {
     console.log(`running at ${port}`);
