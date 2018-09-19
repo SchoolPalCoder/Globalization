@@ -66,18 +66,14 @@ Router.post('/enable', api.enable)
 Router.get('/getCurrentUser', api.getCurrentUser)
 Router.get('/getModuleList',api.getModuleList)
 Router.post('/modifyModuleText', api.modifyModuleText)
+Router.post('/upload', upload.single('file'), api.upload)
 // 解析资源类型
 function parseMime(url) {
     let extName = path.extname(url)
     extName = extName ? extName.slice(1) : 'unknown'
     return MIMES[extName]
 }
-var prdEnv = process.env.NODE_ENV === 'production'
-//生产环境中，除了api之外还需要提供静态资源
-if (prdEnv) {
-    //这里下面的两个读文件的操作，貌似可以直接用ctx.sendFile()代替
-    Router.get('/*', async (ctx, next) => {
-Router.post('/upload', upload.single('file'), api.upload)
+
 
 // var prdEnv = process.env.NODE_ENV === 'production'
 //生产环境中，除了api之外还需要提供静态资源
