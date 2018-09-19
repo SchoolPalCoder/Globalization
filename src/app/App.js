@@ -130,11 +130,11 @@ class App extends Component {
       action: ossUrl,
       data: file => {
         let obj = {
-          policy: 'eyJleHBpcmF0aW9uIjoiMjAxOC0wOS0xOFQxNzoyNDo0NC40NTJaIiwiY29uZGl0aW9ucyI6W1siY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsNTM2ODcwOTEyXV19',
+          policy: 'eyJleHBpcmF0aW9uIjoiMjAxOC0wOS0xOVQxNTo0NDozMi45NjhaIiwiY29uZGl0aW9ucyI6W1siY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsNTM2ODcwOTEyXV19',
           OSSAccessKeyId: 'q2tKifmsvACmj1oF',
           success_action_status: 200,
           // signature: '7hzbU9aDJZYg7tDvG5iUkT4qBOs=',
-          signature: 'Q6fYqd6LSn8nVd/hM9uKvO8c2e8=',
+          signature: 'VcahHrr1tChRh/hqjRaQF0Pe0PY=',
           key: ossFilePath + file.name
         }
         return obj
@@ -245,7 +245,7 @@ class App extends Component {
           : <div>
             <TotalTrans searchParam={this.state.transAllFilter}></TotalTrans>
           </div>
-        }}
+        }
 
       </div>
     )
