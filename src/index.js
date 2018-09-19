@@ -38,15 +38,15 @@ class Login extends React.Component {
                 <div className="login100-form-title" >
 
                 </div>
-                <div className="" >
+                <div className="marT20" >
                     <div className="leftTitle" >
                         <span>用户名：</span></div><Input prefix={<Icon type="user" style={{}} />} value={this.state.username} className="inputArea" onChange={(e) => this.setState({ username: e.target.value })} />
                 </div>
-                <div className="marT30" >
+                <div className="marT20" >
                     <div className="leftTitle">
                         <span>密码：</span></div><Input prefix={<Icon type="lock" style={{}} />} className="inputArea" type="password" value={this.state.password} onChange={(e) => this.setState({ password: e.target.value })} />
                 </div>
-                <Button className="marT30 alignCenter" icon="login" onClick={() => this.login()}>登录</Button>
+                <Button className="marT30 marB15 alignCenter" icon="login" onClick={() => this.login()}>登录</Button>
             </div>
         </div >
     }

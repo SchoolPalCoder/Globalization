@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import logo from '../logo.svg';
 import './App.css';
 // eslint-disable-next-line
-import { Layout, Tabs, Icon, Divider, Upload, Input, Select,Modal, Pagination, Radio, Menu, Button, Card } from 'antd'
+import { Layout, Tabs, Icon, Divider, Upload, Input, Select, Pagination, Radio, Menu, Button, Card, message,Modal } from 'antd'
 import axios from '../net'
 import MultiTable from '../table/table';
 import TotalTrans from "../totalTrans";
 
+const Dragger = Upload.Dragger
 
 
 
@@ -28,8 +29,10 @@ class App extends Component {
     //被更改的模块名称
     formValue:null,
     //更改为的模块名称
-    toValue:null
+    toValue:null,
+    picture: ''
   }
+
   componentDidMount() {
     //获取登录人
     axios.get('/getCurrentUser').then(res => {
@@ -124,8 +127,47 @@ class App extends Component {
 
     })
   }
-
   render() {
+    const ossUrl = 'https://greedyint-qa.oss-cn-hangzhou.aliyuncs.com/'
+    const ossFilePath = '1courseplus/sis/upload/file/37/'
+    const fileConfigs = {
+      name: 'file',
+      multiple: false,
+      listType: 'picture',
+      //后端接口
+      // action: '/upload',
+      // data: file => ({
+      //   module: this.searchParam.module
+      // }),
+      //以下注释部分可传至公司oss，但是不返回文件路径，而且需要先获取几个token，刷新时间不确定；周六拿到的值，周日还能用于上传
+      action: ossUrl,
+      data: file => {
+        let obj = {
+          policy: 'eyJleHBpcmF0aW9uIjoiMjAxOC0wOS0xOVQxNTo0NDozMi45NjhaIiwiY29uZGl0aW9ucyI6W1siY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsNTM2ODcwOTEyXV19',
+          OSSAccessKeyId: 'q2tKifmsvACmj1oF',
+          success_action_status: 200,
+          // signature: '7hzbU9aDJZYg7tDvG5iUkT4qBOs=',
+          signature: 'VcahHrr1tChRh/hqjRaQF0Pe0PY=',
+          key: ossFilePath + file.name
+        }
+        return obj
+      },
+      onChange: (info) => {
+        const status = info.file.status;
+        if (status !== 'uploading') {
+          console.log(info.file, info.fileList);
+        }
+        if (status === 'done') {
+          message.success(`${info.file.name} file uploaded successfully.`);
+          this.setState({
+            picture: ossUrl + ossFilePath + info.file.originFileObj.name
+          })
+          //调用绑定图片url和模块的接口
+        } else if (status === 'error') {
+          message.error(`${info.file.name} file upload failed.`);
+        }
+      },
+    };
     return (
       <div className="App">
         <header className="App-header">
@@ -195,8 +237,12 @@ class App extends Component {
                 this.setState({ transAllFilter: Object.assign(this.state.transAllFilter, { key: value }) }
                 )
               }}></Input.Search>
+
             </div>
+
           }
+
+
         </div>
         <div style={{ textAlign: 'left' }}>
           <span>版本/模块:</span>
@@ -204,18 +250,29 @@ class App extends Component {
           <Button style={{ float: 'right' }} onClick={() => this.export()}>导出</Button>
           <Button onClick={this.syncData.bind(this)} style={{ float: 'right', marginRight: '10px' }}>同步数据</Button>
         </div>
-        {this.state.docType ?
+        {this.state.selectByBranch ? null :
+          <div style={{ width: '80%', margin: '0 auto' }}>
+            <Dragger {...fileConfigs} >
+              <p className="ant-upload-drag-icon">
+                <Icon type="inbox" />
+              </p>
+              <p className="ant-upload-text">Click or drag file to this area to upload</p>
+              <p className="ant-upload-hint">Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files</p>
+            </Dragger>
+          </div>}
+        {this.state.docType && !this.state.selectByBranch ?
           <div>
             <div style={{ padding: '20px' }}>
               <Card
 
                 style={{ width: '100%', height: 240, overflow: 'auto' }}
-                cover={<img alt="1" src="http://ok0nex8hq.bkt.clouddn.com/1533051037.png" />}
+                cover={<img alt="相关图片" src={this.state.picture} />}
               ></Card>
             </div>
-            <MultiTable user={this.state.currentUser} list={this.state.list} count={this.state.totalCount} fresh={() => this.refresh()} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable>
-          </div> :
-          <div>
+          </div> : null}
+        {this.state.docType ?
+          <MultiTable user={this.state.currentUser} list={this.state.list} count={this.state.totalCount} fresh={() => this.refresh()} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable>
+          : <div>
             <TotalTrans searchParam={this.state.transAllFilter}></TotalTrans>
           </div>
         }

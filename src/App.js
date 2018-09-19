@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 // eslint-disable-next-line
-import { Layout, Tabs, Icon, Divider, Upload, Input, Select, Pagination, Radio, Menu, Button, Card } from 'antd'
+import { Layout, Tabs, Icon, Divider, Upload, Input, Select, Pagination, Radio, Menu, Button, Card, message } from 'antd'
 import axios from './net'
 import MultiTable from './table';
 import TotalTrans from "./totalTrans";
-
 
 
 

@@ -7,6 +7,15 @@ const config = require('config');
 const shell = require('shelljs');
 
 const { readFile, writeFile } = require('./fileIO');
+const path = require('path')
+const fs = require('fs')
+const { MIMES } = require('./utils')
+// 解析资源类型
+function parseMime(url) {
+    let extName = path.extname(url)
+    extName = extName ? extName.slice(1) : 'unknown'
+    return MIMES[extName]
+}
 let option = {
 
     getTransTotalList: async (ctx, next) => {
@@ -241,6 +250,25 @@ let option = {
             await trans.findByIdAndUpdate(item._id, { eName: item.eName, state: false }).exec()
         })
         ctx.response.body = true
+    },
+    //上传图片
+    upload: async (ctx, next) => {
+        const filePath = ctx.origin + '/' + ctx.req.file.filename
+        //todo 数据库中记录模块和文件路径的关系
+        // ctx.req.body.module
+        ctx.body = {
+            file: filePath
+        }
+    },
+    //静态资源
+    bundleFile: async (ctx, next) => {
+        if (parseMime(ctx.url) === 'unknown') {
+            ctx.type = 'text/html'
+            ctx.response.body = fs.readFileSync(path.join(__dirname, '../build/index.html'), 'binary')
+        } else {
+            ctx.type = parseMime(ctx.url)
+            ctx.response.body = fs.readFileSync(path.join(__dirname, '../build/', ctx.url))
+        }
     }
 }
 module.exports = option
