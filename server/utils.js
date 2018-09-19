@@ -1,5 +1,7 @@
 const shell = require('shelljs');
 const config = require('config');
+const {recursionDeepQueryModule} = require("./recursionDeepQueryModule");
+const { appModule } = require("./db");
 /**
  *返回工程目录的git 分支信息
  *
@@ -7,7 +9,12 @@ const config = require('config');
  */
 function getBranchList() {
     if (!shell.which('git')) {
-        shell.echo('requires git');
+        shell.echo('需要安装git');
+        shell.exit(1);
+        return [];
+    }
+    if (!config.get('projectPath')){
+        shell.echo('请在config文件中指定项目路径');
         shell.exit(1);
         return [];
     }
@@ -96,11 +103,28 @@ let MIMES = {
     'xml': 'text/xml',
     'unknown': 'unknown',
 }
+function scanModule() {
+    
+    const platformArr = ["pc", "mobile"],
+        filePathArr = [];
+    platformArr.forEach(platform => {
+        filePathArr.push(config.get('projectPath') + `Myth.SIS.Web/fe_${platform}/fe/apps/`)
+    })
+    filePathArr.forEach(_path=>{
+        let arr = shell.find(_path).filter(file => {
+            return file.match(/index\.js$/)
+        });
+        arr.forEach(item=>{
+            recursionDeepQueryModule(item);
+        })
+    })
+}
 module.exports = {
     getBranchList,
     getArrayByLine,
     getLangPathStore,
     deleteQuotes,
     getCurrentBranch,
-    MIMES
+    MIMES,
+    scanModule
 }

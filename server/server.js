@@ -56,6 +56,8 @@ Router.post('/getTransTotalList', api.getTransTotalList)
 Router.post('/save', api.save)
 Router.post('/enable', api.enable)
 Router.get('/getCurrentUser', api.getCurrentUser)
+Router.get('/getModuleList',api.getModuleList)
+Router.post('/modifyModuleText', api.modifyModuleText)
 // 解析资源类型
 function parseMime(url) {
     let extName = path.extname(url)

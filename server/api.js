@@ -1,13 +1,15 @@
 /*
     这个文件用来维护api，具体该返回什么数据等等都在这里操作
 */
-const { trans, user } = require('./db')
+const { trans, user,appModule,mongoose } = require('./db')
 const utils = require('./utils')
+const config = require('config');
+const shell = require('shelljs');
 
 const { readFile, writeFile } = require('./fileIO');
 let option = {
 
-    getTransTotalList: async (ctx) => {
+    getTransTotalList: async (ctx, next) => {
         let { key, pageIdx, pageSize } = ctx.request.body, dbQuery = {};
         if (key) {
             dbQuery = {
@@ -43,11 +45,30 @@ let option = {
     },
     //获取分支列表
     getBranchList: async (ctx, next) => {
+        // utils.scanModule();
         ctx.response.body = await utils.getBranchList(1);
     },
     //获取模块列表
     getModuleList: async (ctx, next) => {
-        ctx.response.body = await trans.distinct('module').exec()
+        let arr = await appModule.find({}).exec(),body={};
+        arr.forEach(item=>{
+            let type = item.platform;
+            body[type] = body[type]||[];
+            body[type].push(item);
+        })
+        ctx.response.body = body;
+    },
+    //修改模块显示名称
+    modifyModuleText:async (ctx)=>{
+        let { id,text } = ctx.request.body;
+        let module = await appModule.find({_id:id});
+        if (module&&module.length){
+            let res = await appModule.update({ _id: mongoose.Types.ObjectId(id)},{$set:{text:text}});
+            ctx.response.body = res.nModified>1? true:false;
+        }else{
+            ctx.response.body = false;
+        }
+        // module.update
     },
     //获取双语数据
     getData: async (ctx, next) => {
@@ -92,6 +113,34 @@ let option = {
     },
     syncData: async (ctx, next) => {
         let branch = utils.getCurrentBranch();
+        
+        //#region 更新mongo中的模块信息 
+        const platformArr = ["pc", "mobile"],
+            filePathArr = [];
+        platformArr.forEach(platform => {
+            filePathArr.push(config.get('projectPath') + `Myth.SIS.Web/fe_${platform}/fe/apps/`);
+        })
+        // new Promise( async (res,rej)=>{
+        for (var i = 0; i < filePathArr.length; i++) {
+            let arr = shell.find(filePathArr[i]).filter(file => {
+                return file.match(/index\.js$/)
+            });
+            await arr.map(async item => {
+                let hasData = await appModule.find({
+                    path: item
+                })
+                if (!hasData.length) {
+                    await appModule.create({
+                        name: item.split('apps/')[1].split('/')[0],
+                        path: item,
+                        text: item.split('apps/')[1].split('/')[0],
+                        platform: item.includes('fe_mobile') ? 'Mobile' : 'PC'
+                    })
+                }
+            })
+        }
+        //#endregion
+        
         await trans.find(function (err, list) {
             if (err) return console.log(err)
             // if (list.length === 0) {

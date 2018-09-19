@@ -37,11 +37,19 @@ user.find({}, (err, item) => {
         })
     }
 })
-
+var appModuleSchema = mongoose.Schema({
+    text:String,
+    path:String,
+    name:String,
+    platform:String,
+})
+var appModule = mongoose.model('appModule', appModuleSchema)
 var fs = require('fs')
 var path = require('path')
 const utils = require('./utils')
 module.exports = {
     trans,
-    user
+    user,
+    appModule,
+    mongoose
 }
