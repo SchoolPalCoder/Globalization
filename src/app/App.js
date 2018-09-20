@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import logo from '../logo.svg';
 import './App.css';
 // eslint-disable-next-line
-import { Layout, Tabs, Icon, Divider, Upload, Input, Select, Pagination, Radio, Menu, Button, Card, message,Modal } from 'antd'
+import { Layout, Tabs, Icon, Divider, Upload, Input, Select, Pagination, Radio, Menu, Button, Card, message, Modal } from 'antd'
 import axios from '../net'
 import MultiTable from '../table/table';
 import TotalTrans from "../totalTrans";
@@ -23,13 +23,13 @@ class App extends Component {
     docType: true,
     transAllFilter: {},
     currentUser: {},
-    showModel:false,
+    showModel: false,
     //被更改的模块对象
-    changedModule:null,
+    changedModule: null,
     //被更改的模块名称
-    formValue:null,
+    formValue: null,
     //更改为的模块名称
-    toValue:null,
+    toValue: null,
     picture: ''
   }
 
@@ -50,9 +50,9 @@ class App extends Component {
       })
 
     })
-    .then(() => {
-      this.getData(this.searchParam)
-    })
+      .then(() => {
+        this.getData(this.searchParam)
+      })
     //获取模块列表
     axios.get('/getModuleList').then(data => {
       this.setState({
@@ -96,9 +96,9 @@ class App extends Component {
 
   }
   //修改模块显示名称
-  changeModuleText(option,event){
+  changeModuleText(option, event) {
     event.stopPropagation();
-    this.setState({ showModel: true, fromValue: option.text, changedModule:option});
+    this.setState({ showModel: true, fromValue: option.text, changedModule: option });
   }
   //刷新，用于table里取消按钮的回调
   refresh() {
@@ -143,11 +143,11 @@ class App extends Component {
       action: ossUrl,
       data: file => {
         let obj = {
-          policy: 'eyJleHBpcmF0aW9uIjoiMjAxOC0wOS0xOVQxNTo0NDozMi45NjhaIiwiY29uZGl0aW9ucyI6W1siY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsNTM2ODcwOTEyXV19',
+          policy: 'eyJleHBpcmF0aW9uIjoiMjAxOC0wOS0yMFQwNjozMzo0NS42MjRaIiwiY29uZGl0aW9ucyI6W1siY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsNTM2ODcwOTEyXV19',
           OSSAccessKeyId: 'q2tKifmsvACmj1oF',
           success_action_status: 200,
           // signature: '7hzbU9aDJZYg7tDvG5iUkT4qBOs=',
-          signature: 'VcahHrr1tChRh/hqjRaQF0Pe0PY=',
+          signature: 'sh65MiI388eaWQSLn7KJKueeT8o=',
           key: ossFilePath + file.name
         }
         return obj
@@ -199,9 +199,9 @@ class App extends Component {
               <Radio value="2">按模块</Radio>
               {/* <Dropdown overlay={ModuleList} trigger={['click']}> */}
               <Select notFoundContent={"请同步数据获取模块列表"} style={{ width: 220 }} onSelect={(val) => { this.searchParam.module = val; this.getData(this.searchParam) }} disabled={this.state.selectByBranch}>
-                  <Select.OptGroup label={"PC"}>
+                <Select.OptGroup label={"PC"}>
                   {this.state.moduleList && this.state.moduleList.PC.map(opt => (<Select.Option key={opt._id} value={opt._id}>
-                    <span style={{paddingRight:"5px"}} >
+                    <span style={{ paddingRight: "5px" }} >
                       <Icon
                         type="form"
                         onClick={this.changeModuleText.bind(this, opt)}
@@ -209,8 +209,8 @@ class App extends Component {
                     </span>
                     {opt.text}
                   </Select.Option>))}
-                  </Select.OptGroup>
-                  <Select.OptGroup label = {"Mobile"} >
+                </Select.OptGroup>
+                <Select.OptGroup label={"Mobile"} >
                   {this.state.moduleList && this.state.moduleList.Mobile.map(opt => (<Select.Option key={opt._id} value={opt._id}>
                     <span style={{ paddingRight: "5px" }} >
                       <Icon
@@ -219,8 +219,8 @@ class App extends Component {
                       />
                     </span>
                     {opt.text}
-                  </Select.Option>)) }
-                  </Select.OptGroup>
+                  </Select.Option>))}
+                </Select.OptGroup>
               </Select>
             </Radio.Group> :
             <div>
@@ -276,21 +276,21 @@ class App extends Component {
             <TotalTrans searchParam={this.state.transAllFilter}></TotalTrans>
           </div>
         }
-        <Modal width={600} title={"修改模块显示名称"} 
-          onOk={()=>{
-            axios.post('/modifyModuleText',{id:this.state.changedModule._id,text:this.state.toValue})
-            .then(data=>{
-              alert('操作成功!')
-            })
+        <Modal width={600} title={"修改模块显示名称"}
+          onOk={() => {
+            axios.post('/modifyModuleText', { id: this.state.changedModule._id, text: this.state.toValue })
+              .then(data => {
+                alert('操作成功!')
+              })
           }}
           visible={this.state.showModel}
           maskClosable={true}
           onCancel={() => { this.setState({ showModel: false }) }}
         >
-          <span>模块属于<span style={{color:"#0090fa"}} >{this.state.changedModule && this.state.changedModule.platform}</span>当前显示名称:<Input readOnly value={this.state.fromValue} ></Input>
+          <span>模块属于<span style={{ color: "#0090fa" }} >{this.state.changedModule && this.state.changedModule.platform}</span>当前显示名称:<Input readOnly value={this.state.fromValue} ></Input>
           </span>
-          <span>修改为:<Input value={this.state.toValue} onChange={(event)=>{
-            this.setState({ toValue: event.target.value})
+          <span>修改为:<Input value={this.state.toValue} onChange={(event) => {
+            this.setState({ toValue: event.target.value })
           }} ></Input></span>
         </Modal>
       </div>
