@@ -142,7 +142,7 @@ class TotalTrans extends React.Component {
     }
     renderPathView() {
         let dataSource = this.state.pathArr.map(item => {
-            let _path = item.location.split('SIS.Web/')[1];
+            let _path = item.location;
             return {
                 platform: _path.startsWith('fe_pc') ? 'PC' : 'mobile',
                 type: _path.includes('fe/apps') ? '模块入口' : (_path.includes('/fe/components/xb') ? "通用组件" : "业务组件"),

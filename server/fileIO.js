@@ -32,7 +32,7 @@ async function readFile(_path, branch = 'master') {
                 identifer,
                 name: cnObj[key],
                 eName: enObj[key],
-                location: _path,
+                location: _path.split('Myth.SIS.Web/')[1],
                 module: 'home',
             };
             let queryTran = await trans.find(tran).exec();

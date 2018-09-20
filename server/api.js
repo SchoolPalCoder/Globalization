@@ -90,6 +90,8 @@ let option = {
                 dbQuery = {
                     module: query.module,
                 }
+                let _module = await appModule.findOne({ _id: mongoose.Types.ObjectId(query.module)});
+                utils.scanModule(_module.path)
             }
             else {
                 dbQuery = {
@@ -123,35 +125,8 @@ let option = {
     },
     syncData: async (ctx, next) => {
         let branch = utils.getCurrentBranch();
-        
-        //#region 更新mongo中的模块信息 
-        const platformArr = ["pc", "mobile"],
-            filePathArr = [];
-        platformArr.forEach(platform => {
-            filePathArr.push(config.get('projectPath') + `Myth.SIS.Web/fe_${platform}/fe/apps/`);
-        })
-        // new Promise( async (res,rej)=>{
-        for (var i = 0; i < filePathArr.length; i++) {
-            let arr = shell.find(filePathArr[i]).filter(file => {
-                return file.match(/index\.js$/)
-            });
-            await arr.map(async item => {
-                let hasData = await appModule.find({
-                    path: item
-                })
-                if (!hasData.length) {
-                    await appModule.create({
-                        name: item.split('apps/')[1].split('/')[0],
-                        path: item,
-                        text: item.split('apps/')[1].split('/')[0],
-                        platform: item.includes('fe_mobile') ? 'Mobile' : 'PC'
-                    })
-                }
-            })
-        }
-        //#endregion
-        
-        await trans.find(function (err, list) {
+        //#region 全库扫描字段
+        await trans.find(async function (err, list) {
             if (err) return console.log(err)
             // if (list.length === 0) {
             let stor = utils.getLangPathStore();
@@ -163,7 +138,7 @@ let option = {
             //去重
             stor = [...new Set(stor)];
             ctx.response.body = { msg: 'langPathStore Finish' };
-            stor.forEach(async path => {
+            await stor.forEach(async path => {
                 await readFile(path, branch);
             })
             console.log('langPathStore Finish');
@@ -174,6 +149,32 @@ let option = {
             // }
 
         })
+        //#endregion
+        //#region 更新mongo中的模块信息 
+        const platformArr = ["pc", "mobile"],
+            filePathArr = [];
+        platformArr.forEach(platform => {
+            filePathArr.push(config.get('projectPath') + `Myth.SIS.Web/fe_${platform}/fe/apps/`);
+        })
+        for (var i = 0; i < filePathArr.length; i++) {
+            let arr = shell.find(filePathArr[i]).filter(file => {
+                return file.match(/index\.js$/)
+            });
+            await arr.map(async item => {
+                let hasData = await appModule.find({
+                    path: item
+                })
+                if (!hasData.length) {
+                    await appModule.create({
+                        name: item.split('apps/')[1].split('/')[0],
+                        path: item.split("Myth.SIS.Web/")[1],
+                        text: item.split('apps/')[1].split('/')[0],
+                        platform: item.includes('fe_mobile') ? 'Mobile' : 'PC'
+                    })
+                }
+            })
+        }
+        //#endregion
     },
     //获取当前登录人
     getCurrentUser: async (ctx) => {

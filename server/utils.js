@@ -2,6 +2,7 @@ const shell = require('shelljs');
 const config = require('config');
 const {recursionDeepQueryModule} = require("./recursionDeepQueryModule");
 const { appModule } = require("./db");
+const path = require('path');
 /**
  *返回工程目录的git 分支信息
  *
@@ -103,21 +104,8 @@ let MIMES = {
     'xml': 'text/xml',
     'unknown': 'unknown',
 }
-function scanModule() {
-    
-    const platformArr = ["pc", "mobile"],
-        filePathArr = [];
-    platformArr.forEach(platform => {
-        filePathArr.push(config.get('projectPath') + `Myth.SIS.Web/fe_${platform}/fe/apps/`)
-    })
-    filePathArr.forEach(_path=>{
-        let arr = shell.find(_path).filter(file => {
-            return file.match(/index\.js$/)
-        });
-        arr.forEach(item=>{
-            recursionDeepQueryModule(item);
-        })
-    })
+function scanModule(_path) {
+    recursionDeepQueryModule(path.join(config.get('projectPath') + "Myth.SIS.Web/", _path));
 }
 module.exports = {
     getBranchList,

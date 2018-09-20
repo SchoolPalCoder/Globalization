@@ -204,7 +204,7 @@ class App extends Component {
               {/* <Dropdown overlay={ModuleList} trigger={['click']}> */}
               <Select notFoundContent={"请同步数据获取模块列表"} style={{ width: 220 }} onSelect={(val) => { this.searchParam.module = val; this.getData(this.searchParam) }} disabled={this.state.selectByBranch}>
                 <Select.OptGroup label={"PC"}>
-                  {this.state.moduleList && this.state.moduleList.PC.map(opt => (<Select.Option key={opt._id} value={opt._id}>
+                  {this.state.moduleList && this.state.moduleList.PC && this.state.moduleList.PC.map(opt => (<Select.Option key={opt._id} value={opt._id}>
                     <span style={{ paddingRight: "5px" }} >
                       <Icon
                         type="form"
@@ -215,7 +215,7 @@ class App extends Component {
                   </Select.Option>))}
                 </Select.OptGroup>
                 <Select.OptGroup label={"Mobile"} >
-                  {this.state.moduleList && this.state.moduleList.Mobile.map(opt => (<Select.Option key={opt._id} value={opt._id}>
+                  {this.state.moduleList && this.state.moduleList.Mobile && this.state.moduleList.Mobile.map(opt => (<Select.Option key={opt._id} value={opt._id}>
                     <span style={{ paddingRight: "5px" }} >
                       <Icon
                         type="form"
