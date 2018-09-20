@@ -53,12 +53,7 @@ class App extends Component {
     .then(() => {
       this.getData(this.searchParam)
     })
-    //获取模块列表
-    axios.get('/getModuleList').then(data => {
-      this.setState({
-        moduleList: data,
-      })
-    })
+    this.getModuleList();
     this.getData = ({ branch, module, key, page = { pageIdx: 1, pageSize: 10 }, state }) => {
       axios.post('/data', { branch, module, key, page, state }).then(data => {
         this.setState({
@@ -94,6 +89,15 @@ class App extends Component {
       }
     }
 
+  }
+  //获取模块下拉列表
+  getModuleList(){
+    //获取模块列表
+    axios.get('/getModuleList').then(data => {
+      this.setState({
+        moduleList: data,
+      })
+    })
   }
   //修改模块显示名称
   changeModuleText(option,event){
@@ -280,7 +284,9 @@ class App extends Component {
           onOk={()=>{
             axios.post('/modifyModuleText',{id:this.state.changedModule._id,text:this.state.toValue})
             .then(data=>{
-              alert('操作成功!')
+              message.success("操作成功!");
+              this.setState({showModel:false});
+              this.getModuleList();
             })
           }}
           visible={this.state.showModel}

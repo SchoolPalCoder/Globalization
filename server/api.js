@@ -83,6 +83,7 @@ let option = {
     getData: async (ctx, next) => {
 
         var query = ctx.request.body
+        query.branch = "* v1.8.3"
         var dbQuery, tempList
         if (query.module || query.branch) {
             if (query.module) {
