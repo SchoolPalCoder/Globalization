@@ -5,6 +5,7 @@ import './App.css';
 import { Layout, Tabs, Icon, Divider, Upload, Input, Select, Pagination, Radio, Menu, Button, Card, message, Modal } from 'antd'
 import axios from '../net'
 import MultiTable from '../table/table';
+import ModuleTable from '../ModuleTable/table';
 import TotalTrans from "../totalTrans";
 
 const Dragger = Upload.Dragger
@@ -275,7 +276,11 @@ class App extends Component {
             </div>
           </div> : null}
         {this.state.docType ?
-          <MultiTable user={this.state.currentUser} list={this.state.list} count={this.state.totalCount} fresh={() => this.refresh()} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable>
+          (
+            this.state.selectByBranch ?
+              <MultiTable list={this.state.list} count={this.state.totalCount} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable> :
+              <ModuleTable list={this.state.list} count={this.state.totalCount} getMore={(src) => this.pageFun(src)} editable={true} ></ModuleTable>
+          )
           : <div>
             <TotalTrans searchParam={this.state.transAllFilter}></TotalTrans>
           </div>

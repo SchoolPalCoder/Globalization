@@ -84,14 +84,15 @@ let option = {
 
         var query = ctx.request.body
         query.branch = "* v1.8.3"
-        var dbQuery, tempList
+        var dbQuery, tempList, pathArr, count;
         if (query.module || query.branch) {
             if (query.module) {
                 dbQuery = {
-                    module: query.module,
+                    // module: query.module,
                 }
                 let _module = await appModule.findOne({ _id: mongoose.Types.ObjectId(query.module)});
-                utils.scanModule(_module.path)
+                pathArr = utils.scanModule(_module.path);
+                pathArr.push(_module.path)
             }
             else {
                 dbQuery = {
@@ -111,14 +112,43 @@ let option = {
             }
 
         }
-        let count = await trans.count(dbQuery)
-        tempList = await trans.find(dbQuery).skip(query.page.pageSize * (query.page.pageIdx - 1)).limit(query.page.pageSize).exec()
-        for (var i = 0; i < tempList.length; i++) {
-            //调试
-            var k = await trans.find({ name: tempList[i].name }).exec()
-            tempList[i].history = k.map(unit => unit.eName).filter((unit, idx, arr) => arr.indexOf(unit) === idx)
+        if (pathArr){
+            let reg = pathArr.map(i=>`(.*/${i})`).join('|');
+            // dbQuery.location = new RegExp(reg)
+            // count = await trans.count(dbQuery);
+            let piplineArr = [
 
+                { $match: { location: new RegExp(reg) } },
+                {
+                    $group: {
+                        _id: "$location",
+                        total: { $sum: 1 },
+                        components:{$push:"$$ROOT"},
+                        key: { $first: "$_id" },
+                    },
+                    
+                },
+                { $sort: { total: -1 } }
+            ];
+            tempList = await trans.aggregate(piplineArr);
+            for (var i = 0; i < tempList.length; i++) {
+                //调试
+                for (var item = 0; item < tempList[i].components.length; item++) {
+                    var k = await trans.find({ name: tempList[i].components[item].name }).exec();
+                    tempList[i].components[item].history = k.map(unit => unit.eName).filter((unit, idx, arr) => arr.indexOf(unit) === idx)
+                }
+            }
+        }else{
+            count = await trans.count(dbQuery)
+            tempList = await trans.find(dbQuery).skip(query.page.pageSize * (query.page.pageIdx - 1)).limit(query.page.pageSize).exec()
+            for (var i = 0; i < tempList.length; i++) {
+                //调试
+                var k = await trans.find({ name: tempList[i].name }).exec()
+                tempList[i].history = k.map(unit => unit.eName).filter((unit, idx, arr) => arr.indexOf(unit) === idx)
+
+            }
         }
+        
 
         ctx.response.body = { list: tempList, currentIdx: query.page.pageIdx, totalCount: count }
 

@@ -5,6 +5,7 @@ import './App.css';
 import { Layout, Tabs, Icon, Divider, Upload, Input, Select, Pagination, Radio, Menu, Button, Card, message } from 'antd'
 import axios from './net'
 import MultiTable from './table';
+import ModuleTable from './ModuleTable';
 import TotalTrans from "./totalTrans";
 
 
@@ -136,7 +137,10 @@ class App extends Component {
                 ></Card>
               </div>
               <div>
-                <MultiTable list={this.state.list} count={this.state.totalCount} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable>
+              {this.state.selectByBranch ?
+                <MultiTable list={this.state.list} count={this.state.totalCount} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable>:
+                  <ModuleTable list={this.state.list} count={this.state.totalCount} getMore={(src) => this.pageFun(src)} editable={true} ></ModuleTable>
+              }
               </div>
               <div>
                 <Button>取消</Button>

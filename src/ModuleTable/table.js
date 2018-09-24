@@ -2,7 +2,7 @@ import React from 'react'
 import { Table, Select, Input, Icon, Button, Popconfirm } from 'antd'
 import axios from '../net'
 import './table.css'
-class MultiTable extends React.Component {
+class ModuleTable extends React.Component {
     constructor() {
         super()
         this.state = {
@@ -112,7 +112,13 @@ class MultiTable extends React.Component {
     }
     render() {
         return <div>
-            <Table rowKey="_id" dataSource={this.state.list} columns={this.columns} onChange={src => this.props.getMore(src)} pagination={{ position: 'top', total: this.props.count }}></Table>
+            {this.state.list.map(dom=>
+                <div>
+                    <h3 >{dom._id}</h3>
+                    <Table rowKey="_id" dataSource={dom.components} columns={this.columns} onChange={src => this.props.getMore(src)} pagination={{ position: 'top', total: this.props.count }}></Table>
+                </div>     
+            )}
+            
             <Popconfirm title="确认取消？" onConfirm={() => this.props.fresh()}>
                 <Button className="marL15">取消</Button>
             </Popconfirm>
@@ -126,4 +132,4 @@ class MultiTable extends React.Component {
         </div>
     }
 }
-export default MultiTable
+export default ModuleTable

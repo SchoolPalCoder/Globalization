@@ -105,7 +105,7 @@ let MIMES = {
     'unknown': 'unknown',
 }
 function scanModule(_path) {
-    recursionDeepQueryModule(path.join(config.get('projectPath') + "Myth.SIS.Web/", _path));
+    return recursionDeepQueryModule(path.join(config.get('projectPath') + "Myth.SIS.Web/", _path));
 }
 module.exports = {
     getBranchList,

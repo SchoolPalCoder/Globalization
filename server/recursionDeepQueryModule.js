@@ -11,9 +11,9 @@
 function recursionDeepQueryModule(_path) {
     const fs = require('fs');
     const path = require('path');
-
+    const shell = require("shelljs");
     const matchxbCompReg = /xb(-\w+)+/g;
-
+    const os = require("os");
     const matchDirectivexbCompReg = /directive(-\w+)+/g;
 
     const matchCtrlCompReg = /components\/(.)+/g;
@@ -22,24 +22,25 @@ function recursionDeepQueryModule(_path) {
     let totalComps = [];
 
     try {
-        let data = fs.readFileSync(_path, 'utf-8');
+        let modulePath = shell.cd(path.dirname(_path)).exec("pwd").toString().trim();
+        let data = fs.readFileSync(modulePath+"/index.js", 'utf-8');
         const rtCtrl = data.indexOf('rt.controller');
         const result = data.slice(0, rtCtrl);
-        const filterSingleQuoteData = result.replace(/'/g, '').replace(/\/\*+(.)+\*+\/|\/\/(.)+/g, '').replace(/\r\n+/g, '');
-
-        const matchArrayResult = filterSingleQuoteData.split(';');
+        const filterSingleQuoteData = result.replace(/'/g, '').replace(/\/\*+(.)+\*+\/|\/\/(.)+/g, '').replace(os.EOL, '');
+        //根据系统的换行符来切割文件
+        const matchArrayResult = filterSingleQuoteData.split(os.EOL);
 
         let tempMatchArray = matchArrayResult.map(item => {
 
             if (item.match(matchxbCompReg) || item.match(matchCtrlCompReg)) {
-                if (item.indexOf('baidu-statistics') === -1) {
+                if (item.indexOf('baidu-statistics') === -1 && item.includes("import")) {
 
                     let doPath = doGetModulePath(item);
 
                     if (doPath.indexOf('index') !== -1) {
-                        return doPath.replace(/\/index$/g, '');
+                        return path.resolve(modulePath, doPath.replace(/\/index$/g, '')) ;
                     } else {
-                        return doPath;
+                        return path.resolve(modulePath,doPath) ;
                     }
                 }
             }
@@ -80,7 +81,7 @@ function recursionDeepQueryModule(_path) {
 
             let afterFilterData = compResult.replace(/\/\/.+/g, '').replace(/'/g, '').replace(/\s*\*\s*\@property.+/g, '').replace(/\t\t\t\$\(body\).+/g, '').replace(/import(.)+xb-webpack-utils;/g, '');
 
-            let matchArrayResult = afterFilterData.split('\r\n').map(item => {
+            let matchArrayResult = afterFilterData.split(os.EOL).map(item => {
                 return item.match(/;$/g) ? item : item + ';'
             }).filter(item => {
                 return item !== ';'
@@ -109,7 +110,7 @@ function recursionDeepQueryModule(_path) {
                 return;
             } else {
                 tempMatchArray.forEach(item => {
-                    totalComps.push(item.replace(/(\.\/\.\.\/\.\.\/components\/)|(\.\/\.\.\/\.\.\/)/g, ''))
+                    totalComps.push(item.replace(/(.*\/components\/)|(\.\/\.\.\/\.\.\/)/g, ''))
                     recursionQuery(item)
                 })
             }
@@ -122,9 +123,7 @@ function recursionDeepQueryModule(_path) {
     function doGetModulePath(item) {
         return item.replace(/^import\s*.+\.\./g, './../..').replace(/;$/g, '').replace(/\/$/g, '');
     }
-
-    console.log(totalComps);
-    console.log([...new Set(totalComps)]);
+    return [...new Set(totalComps)]
 }
 
 module.exports.recursionDeepQueryModule = recursionDeepQueryModule;
