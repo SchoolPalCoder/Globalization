@@ -55,8 +55,8 @@ class App extends Component {
       this.getData(this.searchParam)
     })
     this.getModuleList();
-    this.getData = ({ branch, module, key, page = { pageIdx: 1, pageSize: 10 }, state }) => {
-      axios.post('/data', { branch, module, key, page, state }).then(data => {
+    this.getData = ({ branch, module, key, page = { pageIdx: 1, pageSize: 10 }, state,platform }) => {
+      axios.post('/data', { branch, module, key, page, state, platform }).then(data => {
         this.setState({
           list: data.list,
           totalCount: data.totalCount
@@ -116,7 +116,7 @@ class App extends Component {
   }
   //将现有的双语同步到数据库
   syncData() {
-    axios.post('/syncData', { branch: this.searchParam.branch }).then(data => {
+    axios.post('/syncData', { branch: this.searchParam.branch }, { timeout: 1000 * 60 * 30 }).then(data => {
       console.log(data);
     })
   }
@@ -203,9 +203,16 @@ class App extends Component {
               </Select>
               <Radio value="2">按模块</Radio>
               {/* <Dropdown overlay={ModuleList} trigger={['click']}> */}
-              <Select notFoundContent={"请同步数据获取模块列表"} style={{ width: 220 }} onSelect={(val) => { this.searchParam.module = val; this.getData(this.searchParam) }} disabled={this.state.selectByBranch}>
+              <Select  notFoundContent={"请同步数据获取模块列表"} style={{ width: 220 }} 
+              onSelect={(val) => {
+                let _val = JSON.parse(val);
+                this.searchParam.module = _val._id; 
+                this.searchParam.platform = _val.platform;
+                this.getData(this.searchParam) 
+                }
+              } disabled={this.state.selectByBranch}>
                 <Select.OptGroup label={"PC"}>
-                  {this.state.moduleList && this.state.moduleList.PC && this.state.moduleList.PC.map(opt => (<Select.Option key={opt._id} value={opt._id}>
+                  {this.state.moduleList && this.state.moduleList.PC && this.state.moduleList.PC.map(opt => (<Select.Option key={opt._id} value={JSON.stringify(opt)}>
                     <span style={{ paddingRight: "5px" }} >
                       <Icon
                         type="form"
@@ -216,7 +223,7 @@ class App extends Component {
                   </Select.Option>))}
                 </Select.OptGroup>
                 <Select.OptGroup label={"Mobile"} >
-                  {this.state.moduleList && this.state.moduleList.Mobile && this.state.moduleList.Mobile.map(opt => (<Select.Option key={opt._id} value={opt._id}>
+                  {this.state.moduleList && this.state.moduleList.Mobile && this.state.moduleList.Mobile.map(opt => (<Select.Option key={opt._id} value={JSON.stringify(opt)}>
                     <span style={{ paddingRight: "5px" }} >
                       <Icon
                         type="form"

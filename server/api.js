@@ -59,7 +59,9 @@ let option = {
     },
     //获取模块列表
     getModuleList: async (ctx, next) => {
-        let arr = await appModule.find({}).exec(),body={};
+        let arr = await appModule.aggregate([{
+            $sort: { path: 1 }
+        }]).exec(),body={};
         arr.forEach(item=>{
             let type = item.platform;
             body[type] = body[type]||[];
@@ -83,16 +85,14 @@ let option = {
     getData: async (ctx, next) => {
 
         var query = ctx.request.body
-        query.branch = "* v1.8.3"
-        var dbQuery, tempList, pathArr, count;
+        var dbQuery, tempList, pathArr, count, _module
         if (query.module || query.branch) {
             if (query.module) {
                 dbQuery = {
                     // module: query.module,
                 }
-                let _module = await appModule.findOne({ _id: mongoose.Types.ObjectId(query.module)});
+                _module = await appModule.findOne({ _id: mongoose.Types.ObjectId(query.module)});
                 pathArr = utils.scanModule(_module.path);
-                pathArr.push(_module.path)
             }
             else {
                 dbQuery = {
@@ -113,12 +113,14 @@ let option = {
 
         }
         if (pathArr){
-            let reg = pathArr.map(i=>`(.*/${i})`).join('|');
+            let reg = pathArr.map(i => `((fe_${query.platform}).*/${i})`).join('|');
             // dbQuery.location = new RegExp(reg)
             // count = await trans.count(dbQuery);
+            //在正则最后添加当前模块js的路径 让apps的语言包也可以被检索出来
+            reg +=`|(${_module.path.split('/index.js')[0]})`
             let piplineArr = [
 
-                { $match: { location: new RegExp(reg) } },
+                { $match: { location: new RegExp(reg,'i') } },
                 {
                     $group: {
                         _id: "$location",
@@ -154,11 +156,8 @@ let option = {
 
     },
     syncData: async (ctx, next) => {
-        let branch = utils.getCurrentBranch();
+        let branch = utils.getCurrentBranch().replace('*','').trim();
         //#region 全库扫描字段
-        await trans.find(async function (err, list) {
-            if (err) return console.log(err)
-            // if (list.length === 0) {
             let stor = utils.getLangPathStore();
             stor = stor.map(item => {
                 let path = item.split('/');
@@ -167,18 +166,18 @@ let option = {
             })
             //去重
             stor = [...new Set(stor)];
-            ctx.response.body = { msg: 'langPathStore Finish' };
-            await stor.forEach(async path => {
-                await readFile(path, branch);
+            let promiseArr = [];
+            for (let index = 0; index < stor.length; index++) {
+                const path = stor[index];
+                promiseArr.push(readFile(path, branch)) 
+            }
+            Promise.all(promiseArr).then( (data)=>{
+                ctx.response.body = { msg: 'langPathStore Finish' };
+                console.log('langPathStore Finish');
+            }).catch(err=>{
+                ctx.response.body = { err };
+                console.log(err);
             })
-            console.log('langPathStore Finish');
-            // next();
-            // } else {
-            //     ctx.response.body = { msg: 'langPathStore already exist' };
-            //     // next();
-            // }
-
-        })
         //#endregion
         //#region 更新mongo中的模块信息 
         const platformArr = ["pc", "mobile"],
@@ -192,7 +191,7 @@ let option = {
             });
             await arr.map(async item => {
                 let hasData = await appModule.find({
-                    path: item
+                    path: item.split('Myth.SIS.Web/')[1]
                 })
                 if (!hasData.length) {
                     await appModule.create({

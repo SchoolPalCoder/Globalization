@@ -38,7 +38,7 @@ class ModuleTable extends React.Component {
         key: 'history',
         width: 300,
         render: (item, src, idx) => {
-            return <Select placeholder="Please Select" defaultValue={src.eName} style={{ width: '100%' }} onSelect={(val, a) => {
+            return <Select placeholder="Please Select" defaultValue={src.eName} style={{ width: '300px' }} onSelect={(val, a) => {
                 // src.eName = val;
                 // console.log(src.eName);
                 this.change(val, src, idx)
@@ -52,7 +52,7 @@ class ModuleTable extends React.Component {
         key: 'eName',
         width: 300,
         render: (value, src, idx) => {
-            return <Input
+            return <Input type={"textarea"}
                 value={value}
                 onChange={(e) => this.handleChange(e, src, idx)}
                 // onPressEnter={this.check}
@@ -112,10 +112,10 @@ class ModuleTable extends React.Component {
     }
     render() {
         return <div>
-            {this.state.list.map(dom=>
-                <div>
+            {this.state.list.map((dom,index)=>
+                <div key={index}>
                     <h3 >{dom._id}</h3>
-                    <Table rowKey="_id" dataSource={dom.components} columns={this.columns} onChange={src => this.props.getMore(src)} pagination={{ position: 'top', total: this.props.count }}></Table>
+                    <Table rowKey="_id" dataSource={dom.components} columns={this.columns}></Table>
                 </div>     
             )}
             
