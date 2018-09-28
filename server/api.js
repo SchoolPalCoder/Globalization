@@ -1,7 +1,7 @@
 /*
     这个文件用来维护api，具体该返回什么数据等等都在这里操作
 */
-const { trans, user,appModule,mongoose } = require('./db')
+const { trans, user, appModule, mongoose } = require('./db')
 const utils = require('./utils')
 const config = require('config');
 const shell = require('shelljs');
@@ -9,7 +9,8 @@ const shell = require('shelljs');
 const { readFile, writeFile } = require('./fileIO');
 const path = require('path')
 const fs = require('fs')
-const { MIMES } = require('./utils')
+const { MIMES } = require('./utils');
+const _async = require('async');
 // 解析资源类型
 function parseMime(url) {
     let extName = path.extname(url)
@@ -61,22 +62,22 @@ let option = {
     getModuleList: async (ctx, next) => {
         let arr = await appModule.aggregate([{
             $sort: { path: 1 }
-        }]).exec(),body={};
-        arr.forEach(item=>{
+        }]).exec(), body = {};
+        arr.forEach(item => {
             let type = item.platform;
-            body[type] = body[type]||[];
+            body[type] = body[type] || [];
             body[type].push(item);
         })
         ctx.response.body = body;
     },
     //修改模块显示名称
-    modifyModuleText:async (ctx)=>{
-        let { id,text } = ctx.request.body;
-        let module = await appModule.find({_id:id});
-        if (module&&module.length){
-            let res = await appModule.update({ _id: mongoose.Types.ObjectId(id)},{$set:{text:text}});
-            ctx.response.body = res.nModified>1? true:false;
-        }else{
+    modifyModuleText: async (ctx) => {
+        let { id, text } = ctx.request.body;
+        let module = await appModule.find({ _id: id });
+        if (module && module.length) {
+            let res = await appModule.update({ _id: mongoose.Types.ObjectId(id) }, { $set: { text: text } });
+            ctx.response.body = res.nModified > 1 ? true : false;
+        } else {
             ctx.response.body = false;
         }
         // module.update
@@ -91,7 +92,7 @@ let option = {
                 dbQuery = {
                     // module: query.module,
                 }
-                _module = await appModule.findOne({ _id: mongoose.Types.ObjectId(query.module)});
+                _module = await appModule.findOne({ _id: mongoose.Types.ObjectId(query.module) });
                 pathArr = utils.scanModule(_module.path);
             }
             else {
@@ -112,23 +113,23 @@ let option = {
             }
 
         }
-        if (pathArr){
+        if (pathArr) {
             let reg = pathArr.map(i => `((fe_${query.platform}).*/${i})`).join('|');
             // dbQuery.location = new RegExp(reg)
             // count = await trans.count(dbQuery);
             //在正则最后添加当前模块js的路径 让apps的语言包也可以被检索出来
-            reg +=`|(${_module.path.split('/index.js')[0]})`
+            reg += `|(${_module.path.split('/index.js')[0]})`
             let piplineArr = [
 
-                { $match: { location: new RegExp(reg,'i') } },
+                { $match: { location: new RegExp(reg, 'i') } },
                 {
                     $group: {
                         _id: "$location",
                         total: { $sum: 1 },
-                        components:{$push:"$$ROOT"},
+                        components: { $push: "$$ROOT" },
                         key: { $first: "$_id" },
                     },
-                    
+
                 },
                 { $sort: { total: -1 } }
             ];
@@ -140,7 +141,7 @@ let option = {
                     tempList[i].components[item].history = k.map(unit => unit.eName).filter((unit, idx, arr) => arr.indexOf(unit) === idx)
                 }
             }
-        }else{
+        } else {
             count = await trans.count(dbQuery)
             tempList = await trans.find(dbQuery).skip(query.page.pageSize * (query.page.pageIdx - 1)).limit(query.page.pageSize).exec()
             for (var i = 0; i < tempList.length; i++) {
@@ -150,59 +151,59 @@ let option = {
 
             }
         }
-        
+
 
         ctx.response.body = { list: tempList, currentIdx: query.page.pageIdx, totalCount: count }
 
     },
     syncData: async (ctx, next) => {
-        let branch = utils.getCurrentBranch().replace('*','').trim();
+        console.time("时间")
+        let branch = utils.getCurrentBranch().replace('*', '').trim();
         //#region 全库扫描字段
-            let stor = utils.getLangPathStore();
-            stor = stor.map(item => {
-                let path = item.split('/');
-                path.pop();
-                return path.join('/')
-            })
-            //去重
-            stor = [...new Set(stor)];
-            let promiseArr = [];
-            for (let index = 0; index < stor.length; index++) {
-                const path = stor[index];
-                promiseArr.push(readFile(path, branch)) 
-            }
-            Promise.all(promiseArr).then( (data)=>{
-                ctx.response.body = { msg: 'langPathStore Finish' };
-                console.log('langPathStore Finish');
-            }).catch(err=>{
-                ctx.response.body = { err };
-                console.log(err);
-            })
+        let stor = utils.getLangPathStore();
+        stor = stor.map(item => {
+            let path = item.split('/');
+            path.pop();
+            return path.join('/')
+        })
+        //去重
+        stor = [...new Set(stor)];
+        const promiseArr = stor.map(async path => {
+            const res = readFile(path, branch);
+            return res;
+        });
+        return Promise.all(promiseArr)
+        .then(()=>{
+            console.timeEnd("时间")
+            ctx.response.body = { msg: 'langPathStore Finish' };
+            console.log('the response status is ', ctx.status);
+            console.log('langPathStore Finish');
+        })
         //#endregion
         //#region 更新mongo中的模块信息 
-        const platformArr = ["pc", "mobile"],
-            filePathArr = [];
-        platformArr.forEach(platform => {
-            filePathArr.push(config.get('projectPath') + `Myth.SIS.Web/fe_${platform}/fe/apps/`);
-        })
-        for (var i = 0; i < filePathArr.length; i++) {
-            let arr = shell.find(filePathArr[i]).filter(file => {
-                return file.match(/index\.js$/)
-            });
-            await arr.map(async item => {
-                let hasData = await appModule.find({
-                    path: item.split('Myth.SIS.Web/')[1]
-                })
-                if (!hasData.length) {
-                    await appModule.create({
-                        name: item.split('apps/')[1].split('/')[0],
-                        path: item.split("Myth.SIS.Web/")[1],
-                        text: item.split('apps/')[1].split('/')[0],
-                        platform: item.includes('fe_mobile') ? 'Mobile' : 'PC'
-                    })
-                }
-            })
-        }
+        // const platformArr = ["pc", "mobile"],
+        //     filePathArr = [];
+        // platformArr.forEach(platform => {
+        //     filePathArr.push(config.get('projectPath') + `Myth.SIS.Web/fe_${platform}/fe/apps/`);
+        // })
+        // for (var i = 0; i < filePathArr.length; i++) {
+        //     let arr = shell.find(filePathArr[i]).filter(file => {
+        //         return file.match(/index\.js$/)
+        //     });
+        //     await arr.map(async item => {
+        //         let hasData = await appModule.find({
+        //             path: item.split('Myth.SIS.Web/')[1]
+        //         })
+        //         if (!hasData.length) {
+        //             await appModule.create({
+        //                 name: item.split('apps/')[1].split('/')[0],
+        //                 path: item.split("Myth.SIS.Web/")[1],
+        //                 text: item.split('apps/')[1].split('/')[0],
+        //                 platform: item.includes('fe_mobile') ? 'Mobile' : 'PC'
+        //             })
+        //         }
+        //     })
+        // }
         //#endregion
     },
     //获取当前登录人

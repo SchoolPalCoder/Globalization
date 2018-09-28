@@ -20,6 +20,18 @@ var transSchema = mongoose.Schema({
     history: Array,
     mTime: Date,
 })
+// transSchema.index({
+//     identifer: 1,
+// })
+// transSchema.index({
+//     name: 1,
+// })
+// transSchema.index({
+//     eName: 1,
+// })
+// transSchema.index({
+//     module: 1,
+// })
 var trans = mongoose.model('Trans', transSchema);
 //用户表
 var userSchema = mongoose.Schema({

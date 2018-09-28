@@ -10,7 +10,6 @@ const path = require('path')
 const multer = require('koa-multer')
 const api = require('./api')
 const serveStatic = require('koa-static')
-
 const host = '127.0.0.1';
 const port = 9090;
 const app = new Koa();

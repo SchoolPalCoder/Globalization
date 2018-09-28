@@ -1,9 +1,9 @@
-import axios from 'axios'
-import { message} from 'antd';
-import React from "react";
+import axios from 'axios';
+import { message } from 'antd';
 
+import {showFullScreenLoading,tryHideFullScreenLoading} from "./services/loading";
 axios.interceptors.response.use(res => {
-    message.destroy()
+    tryHideFullScreenLoading();
     return res.data
 }, err => {
     if (err.response.status === 401) {
@@ -13,8 +13,7 @@ axios.interceptors.response.use(res => {
     return Promise.reject(err.response)
 })
 axios.interceptors.request.use(req=>{
-    let aaa = message.loading("数据获取中...");
-    console.log(aaa);
+    showFullScreenLoading();
     return req;
 },err=>{
     return Promise.reject(err)
