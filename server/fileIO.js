@@ -47,7 +47,7 @@ async function readFile(_path, branch = 'master') {
                 return new Promise(async (resolve, rej) => {
                     concurrencyCount++;
                     const _tran = await trans.find(tran);
-                    console.log('并发数:', concurrencyCount--, 'name:', tran.name);
+                    // console.log('并发数:', concurrencyCount--, 'name:', tran.name);
                     if (!_tran.length) {
                         trans.create({
                             branch,

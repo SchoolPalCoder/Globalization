@@ -168,10 +168,37 @@ let option = {
         })
         //去重
         stor = [...new Set(stor)];
-        const promiseArr = stor.map(async path => {
+        let promiseArr = stor.map(async path => {
             const res = readFile(path, branch);
             return res;
         });
+        //#region 更新mongo中的模块信息 
+        const platformArr = ["pc", "mobile"],
+            filePathArr = [];
+        platformArr.forEach(platform => {
+            filePathArr.push(config.get('projectPath') + `Myth.SIS.Web/fe_${platform}/fe/apps/`);
+        })
+        for (var i = 0; i < filePathArr.length; i++) {
+            let arr = shell.find(filePathArr[i]).filter(file => {
+                return file.match(/index\.js$/)
+            });
+            const modelPro =  arr.map(async item => {
+                let hasData = await appModule.find({
+                    path: item.split('Myth.SIS.Web/')[1]
+                })
+                if (!hasData.length) {
+                    return await appModule.create({
+                        name: item.split('apps/')[1].split('/')[0],
+                        path: item.split("Myth.SIS.Web/")[1],
+                        text: item.split('apps/')[1].split('/')[0],
+                        platform: item.includes('fe_mobile') ? 'Mobile' : 'PC'
+                    })
+                }
+                return Promise.resolve();
+            })
+            promiseArr = promiseArr.concat(modelPro);
+        }
+        //#endregion
         return Promise.all(promiseArr)
         .then(()=>{
             console.timeEnd("时间")
@@ -180,31 +207,7 @@ let option = {
             console.log('langPathStore Finish');
         })
         //#endregion
-        //#region 更新mongo中的模块信息 
-        // const platformArr = ["pc", "mobile"],
-        //     filePathArr = [];
-        // platformArr.forEach(platform => {
-        //     filePathArr.push(config.get('projectPath') + `Myth.SIS.Web/fe_${platform}/fe/apps/`);
-        // })
-        // for (var i = 0; i < filePathArr.length; i++) {
-        //     let arr = shell.find(filePathArr[i]).filter(file => {
-        //         return file.match(/index\.js$/)
-        //     });
-        //     await arr.map(async item => {
-        //         let hasData = await appModule.find({
-        //             path: item.split('Myth.SIS.Web/')[1]
-        //         })
-        //         if (!hasData.length) {
-        //             await appModule.create({
-        //                 name: item.split('apps/')[1].split('/')[0],
-        //                 path: item.split("Myth.SIS.Web/")[1],
-        //                 text: item.split('apps/')[1].split('/')[0],
-        //                 platform: item.includes('fe_mobile') ? 'Mobile' : 'PC'
-        //             })
-        //         }
-        //     })
-        // }
-        //#endregion
+        
     },
     //获取当前登录人
     getCurrentUser: async (ctx) => {
