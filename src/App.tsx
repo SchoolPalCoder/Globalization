@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import * as React from 'react';
 import logo from './logo.svg';
 import './App.css';
 // eslint-disable-next-line
@@ -10,7 +10,7 @@ import TotalTrans from "./totalTrans";
 
 
 
-class App extends Component {
+class App extends React.Component<any, any> {
   _this = this
   state = {
     list: [],
@@ -137,10 +137,10 @@ class App extends Component {
                 ></Card>
               </div>
               <div>
-              {this.state.selectByBranch ?
-                <MultiTable list={this.state.list} count={this.state.totalCount} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable>:
+                {this.state.selectByBranch ?
+                  <MultiTable list={this.state.list} count={this.state.totalCount} getMore={(src) => this.pageFun(src)} editable={true} ></MultiTable> :
                   <ModuleTable list={this.state.list} count={this.state.totalCount} getMore={(src) => this.pageFun(src)} editable={true} ></ModuleTable>
-              }
+                }
               </div>
               <div>
                 <Button>取消</Button>
