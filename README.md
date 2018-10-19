@@ -23,3 +23,4 @@
  + 编写接口
  + 图片存储
  
+## 想切换到ts，但是似乎有点复杂，因为已经把react-script改成了ract-app-rewired，不保证有ts版本
