@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 // eslint-disable-next-line
@@ -10,7 +10,7 @@ import TotalTrans from "./totalTrans";
 
 
 
-class App extends React.Component<any, any> {
+class App extends React.Component {
   _this = this
   state = {
     list: [],
