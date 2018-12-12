@@ -26,8 +26,8 @@ function getBranchList() {
     // localStorage.setItem('currentBranch', branches.find(item => {
     //     return item.startsWith('*');
     // }));
-    return branches.filter(i => i.trim().startsWith('remotes'))
-        .map(i => i.split('/').pop()).filter(i => i.match(/v(\.?\d)+/g)).reverse();
+    return branches.filter(i => (i.trim().startsWith('remotes') || i.trim().startsWith("*")))
+        .map(i => i.split('/').pop()).filter(i => (i.trim().startsWith("*")||i.match(/^(v|\*)(\.?\d)+/g))).reverse();
 }
 
 

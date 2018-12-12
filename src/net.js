@@ -7,7 +7,7 @@ axios.interceptors.response.use(res => {
     return res.data
 }, err => {
     tryHideFullScreenLoading();
-    if (err.response.status === 401) {
+    if (err.response && err.response.status === 401) {
         message.error("登录过期,请重新登录!")
         window.location.href = '/login'
     }

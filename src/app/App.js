@@ -44,8 +44,8 @@ class App extends Component {
     //获取分支列表
     axios.get('/branchList').then(data => {
       this.setState({
-        branchList: data,
-        defaultBranch: data[0]
+        branchList: data.filter(i => i.startsWith('v')),
+        defaultBranch: data[data.length-1].split(' ')[1]
       }, () => {
         this.searchParam.branch = this.state.defaultBranch;
       })
@@ -118,6 +118,10 @@ class App extends Component {
   syncData() {
     axios.post('/syncData', { branch: this.searchParam.branch }, { timeout: 1000 * 60 * 30 }).then(data => {
       console.log(data);
+      message.success("同步完成!")
+    })
+    .catch(err=>{
+      message.error("同步失败!")
     })
   }
   //在页面翻译和翻译总表切换的回调
@@ -134,7 +138,8 @@ class App extends Component {
   }
   render() {
     const ossUrl = 'https://greedyint-qa.oss-cn-hangzhou.aliyuncs.com/'
-    const ossFilePath = '1courseplus/sis/upload/file/37/'
+    const ossFilePath = '1courseplus/sis/upload/file/37/';
+
     const fileConfigs = {
       name: 'file',
       multiple: false,
@@ -194,10 +199,13 @@ class App extends Component {
           {this.state.docType ?
             <Radio.Group defaultValue="1" onChange={() => this.setState({ selectByBranch: !this.state.selectByBranch })}>
               <Radio value="1">按版本</Radio>
-              <Select
-                defaultValue={this.state.defaultBranch}
-                style={{ width: 120, marginRight: 15 }}
-                onChange={(val) => { this.searchParam.branch = val; this.getData(this.searchParam) }}
+              <Select value={this.state.defaultBranch}
+                style={{ width: 120 }} 
+                onChange={(val) => { 
+                  this.searchParam.branch = val; 
+                  this.setState({ defaultBranch:val}); 
+                  this.getData(this.searchParam) 
+                }}
                 disabled={!this.state.selectByBranch}>
                 {this.state.branchList.map(item => (<Select.Option key={item} value={item}>{item}</Select.Option>))}
               </Select>
