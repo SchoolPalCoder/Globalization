@@ -185,8 +185,8 @@ class App extends Component {
         {/* <div style={{margin:'0 auto'}}> */}
         <div style={{ marginBottom: 15 }}>
           <Radio.Group defaultValue='页面翻译'>
-            <Radio.Button value='页面翻译' onClick={() => { this.changeDocType(true); this.searchParam.changeToPageType(); this.getData(this.searchParam); this.setState({ selectByBranch: true }) }}>页面翻译</Radio.Button>
-            <Radio.Button value='翻译总表' onClick={() => { this.changeDocType(false); this.searchParam.changeToAllType(); this.getData(this.searchParam) }} >翻译总表</Radio.Button>
+            <Radio.Button value='页面翻译' onClick={() => { this.changeDocType(true); this.searchParam.changeToPageType(); this.getData(this.searchParam)}}>页面翻译</Radio.Button>
+            <Radio.Button value='翻译总表' onClick={() => { this.changeDocType(false); this.searchParam.changeToAllType(); this.getData(this.searchParam); this.setState({ selectByBranch: true }) }} >翻译总表</Radio.Button>
           </Radio.Group>
         </div>
         <div style={{ marginBottom: 15 }}>

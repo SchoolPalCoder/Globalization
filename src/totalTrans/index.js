@@ -173,7 +173,7 @@ class TotalTrans extends React.Component {
     render() {
         return (
             <div>
-                <Table rowKey="key" dataSource={this.state.list} columns={this.columns} onChange={src => this.getMore(src)} pagination={{ total: this.state.totalCount }}></Table>
+                <Table style={{ border: '1px solid #e8e8e8', marginBottom: 30 }} rowKey="key" dataSource={this.state.list} columns={this.columns} onChange={src => this.getMore(src)} pagination={{ total: this.state.totalCount }}></Table>
                 <Modal width={600} title={"字段引用信息"}
                     visible={this.state.showModel}
                     footer={null}
