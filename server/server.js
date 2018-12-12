@@ -85,7 +85,6 @@ function parseMime(url) {
 // }
 
 app.use(Router.routes(), Router.allowedMethods({ throw: true }))
-
 app.on('error', err => {
     console.error('server error', err)
 });

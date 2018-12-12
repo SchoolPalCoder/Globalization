@@ -52,7 +52,9 @@ class ModuleTable extends React.Component {
         key: 'eName',
         width: 300,
         render: (value, src, idx) => {
-            return <Input type={"textarea"}
+            return <Input type={"textarea"} onBlur={(e)=>{
+                this.saveField(e,src,idx)
+            }}
                 value={value}
                 onChange={(e) => this.handleChange(e, src, idx)}
                 // onPressEnter={this.check}
@@ -81,7 +83,7 @@ class ModuleTable extends React.Component {
             return val ? '已生效' : '未生效'
         }
     }];
-    handleChange(e, src) {
+    handleChange(e, src,idx) {
         src.modify = true
         src.eName = e.target.value;
         this.setState({

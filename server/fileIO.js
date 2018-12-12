@@ -43,6 +43,7 @@ async function readFile(_path, branch = 'master') {
                     eName: enObj[key],
                     location: _path.split('Myth.SIS.Web/')[1],
                     module: 'home',
+                    state: cnObj[key] != enObj[key]
                 };
                 return new Promise(async (resolve, rej) => {
                     concurrencyCount++;

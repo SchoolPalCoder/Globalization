@@ -32,8 +32,9 @@ let option = {
                 { $match: { name: { $ne: null } } },
                 {
                     $group: {
-                        _id: { name: "$name", eName: "$eName", identifer: "$identifer" },
+                        _id: { name: "$name", eName: "$eName" },
                         total: { $sum: 1 },
+                        // state:{$in:[true]},
                         pathArr: { $push: { location: "$location", identifer: "$identifer", key: "$_id" } },
                         key: { $first: "$_id" },
                     }
@@ -191,7 +192,7 @@ let option = {
                         name: item.split('apps/')[1].split('/')[0],
                         path: item.split("Myth.SIS.Web/")[1],
                         text: item.split('apps/')[1].split('/')[0],
-                        platform: item.includes('fe_mobile') ? 'Mobile' : 'PC'
+                        platform: item.includes('fe_mobile') ? 'Mobile' : 'PC',
                     })
                 }
                 return Promise.resolve();
