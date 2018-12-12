@@ -51,11 +51,11 @@ class App extends Component {
       })
 
     })
-    .then(() => {
-      this.getData(this.searchParam)
-    })
+      .then(() => {
+        this.getData(this.searchParam)
+      })
     this.getModuleList();
-    this.getData = ({ branch, module, key, page = { pageIdx: 1, pageSize: 10 }, state,platform }) => {
+    this.getData = ({ branch, module, key, page = { pageIdx: 1, pageSize: 10 }, state, platform }) => {
       axios.post('/data', { branch, module, key, page, state, platform }).then(data => {
         this.setState({
           list: data.list,
@@ -92,7 +92,7 @@ class App extends Component {
 
   }
   //获取模块下拉列表
-  getModuleList(){
+  getModuleList() {
     //获取模块列表
     axios.get('/getModuleList').then(data => {
       this.setState({
@@ -188,13 +188,13 @@ class App extends Component {
           To get started, edit <code>src/App.js</code> and save to reload.
         </p> */}
         {/* <div style={{margin:'0 auto'}}> */}
-        <div>
+        <div style={{ marginBottom: 15 }}>
           <Radio.Group defaultValue='页面翻译'>
-            <Radio.Button value='页面翻译' onClick={() => { this.changeDocType(true); this.searchParam.changeToPageType(); this.getData(this.searchParam) }}>页面翻译</Radio.Button>
+            <Radio.Button value='页面翻译' onClick={() => { this.changeDocType(true); this.searchParam.changeToPageType(); this.getData(this.searchParam); this.setState({ selectByBranch: true }) }}>页面翻译</Radio.Button>
             <Radio.Button value='翻译总表' onClick={() => { this.changeDocType(false); this.searchParam.changeToAllType(); this.getData(this.searchParam) }} >翻译总表</Radio.Button>
           </Radio.Group>
         </div>
-        <div>
+        <div style={{ marginBottom: 15 }}>
           <span>筛选：</span>
           {this.state.docType ?
             <Radio.Group defaultValue="1" onChange={() => this.setState({ selectByBranch: !this.state.selectByBranch })}>
@@ -211,14 +211,14 @@ class App extends Component {
               </Select>
               <Radio value="2">按模块</Radio>
               {/* <Dropdown overlay={ModuleList} trigger={['click']}> */}
-              <Select  notFoundContent={"请同步数据获取模块列表"} style={{ width: 220 }} 
-              onSelect={(val) => {
-                let _val = JSON.parse(val);
-                this.searchParam.module = _val._id; 
-                this.searchParam.platform = _val.platform;
-                this.getData(this.searchParam) 
+              <Select notFoundContent={"请同步数据获取模块列表"} style={{ width: 220 }}
+                onSelect={(val) => {
+                  let _val = JSON.parse(val);
+                  this.searchParam.module = _val._id;
+                  this.searchParam.platform = _val.platform;
+                  this.getData(this.searchParam)
                 }
-              } disabled={this.state.selectByBranch}>
+                } disabled={this.state.selectByBranch}>
                 <Select.OptGroup label={"PC"}>
                   {this.state.moduleList && this.state.moduleList.PC && this.state.moduleList.PC.map(opt => (<Select.Option key={opt._id} value={JSON.stringify(opt)}>
                     <span style={{ paddingRight: "5px" }} >
@@ -243,7 +243,7 @@ class App extends Component {
                 </Select.OptGroup>
               </Select>
             </Radio.Group> :
-            <div>
+            <div style={{ display: 'inline-block' }}>
               <Select style={{ width: 120, display: 'inline-block' }} defaultValue="全部" onSelect={(val) => {
                 let transAllFilter = Object.assign(this.state.transAllFilter, { type: val === '0' ? '' : (val === '1' ? false : true) });
                 this.setState({ transAllFilter })
@@ -264,9 +264,9 @@ class App extends Component {
 
 
         </div>
-        <div style={{ textAlign: 'left' }}>
-          <span>版本/模块:</span>
-          <span>招生</span>
+        <div style={{ overflow: 'hidden', marginBottom: 15 }}>
+          <span style={{ float: 'left' }}>版本/模块:</span>
+          <span style={{ fontWeight: 600, float: 'left' }}>招生</span>
           <Button style={{ float: 'right' }} onClick={() => this.export()}>导出</Button>
           <Button onClick={this.syncData.bind(this)} style={{ float: 'right', marginRight: '10px' }}>同步数据</Button>
         </div>
@@ -300,14 +300,14 @@ class App extends Component {
             <TotalTrans searchParam={this.state.transAllFilter}></TotalTrans>
           </div>
         }
-        <Modal width={600} title={"修改模块显示名称"} 
-          onOk={()=>{
-            axios.post('/modifyModuleText',{id:this.state.changedModule._id,text:this.state.toValue})
-            .then(data=>{
-              message.success("操作成功!");
-              this.setState({showModel:false});
-              this.getModuleList();
-            })
+        <Modal width={600} title={"修改模块显示名称"}
+          onOk={() => {
+            axios.post('/modifyModuleText', { id: this.state.changedModule._id, text: this.state.toValue })
+              .then(data => {
+                message.success("操作成功!");
+                this.setState({ showModel: false });
+                this.getModuleList();
+              })
           }}
           visible={this.state.showModel}
           maskClosable={true}
