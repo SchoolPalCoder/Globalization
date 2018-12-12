@@ -22,8 +22,13 @@ function recursionDeepQueryModule(_path) {
     let totalComps = [];
 
     try {
-        let modulePath = shell.cd(path.dirname(_path)).exec("pwd").toString().trim();
-        let data = fs.readFileSync(modulePath+"/index.js", 'utf-8');
+        let modulePath = '';
+        if (os.platform() == 'win32') {
+            modulePath = path.dirname(_path);
+        } else {
+            modulePath = shell.cd(path.dirname(_path)).exec("pwd").toString().trim();
+        }
+        let data = fs.readFileSync(modulePath + "/index.js", 'utf-8');
         const rtCtrl = data.indexOf('rt.controller');
         const result = data.slice(0, rtCtrl);
         const filterSingleQuoteData = result.replace(/'/g, '').replace(/\/\*+(.)+\*+\/|\/\/(.)+/g, '').replace(os.EOL, '');
@@ -38,9 +43,9 @@ function recursionDeepQueryModule(_path) {
                     let doPath = doGetModulePath(item);
 
                     if (doPath.indexOf('index') !== -1) {
-                        return path.resolve(modulePath, doPath.replace(/\/index$/g, '')) ;
+                        return path.resolve(modulePath, doPath.replace(/\/index$/g, ''));
                     } else {
-                        return path.resolve(modulePath,doPath) ;
+                        return path.resolve(modulePath, doPath);
                     }
                 }
             }
