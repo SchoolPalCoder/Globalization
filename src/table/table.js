@@ -111,18 +111,19 @@ class MultiTable extends React.Component {
         this.props.fresh()
     }
     render() {
-        return <div>
-            <Table rowKey="_id" dataSource={this.state.list} columns={this.columns} onChange={src => this.props.getMore(src)} pagination={{ position: 'top', total: this.props.count }}></Table>
-            <Popconfirm title="确认取消？" onConfirm={() => this.props.fresh()}>
-                <Button className="marL15">取消</Button>
-            </Popconfirm>
-            <Popconfirm title="确认保存？" onConfirm={() => this.save()}>
-                <Button className="marL15">保存</Button>
-            </Popconfirm>
-            {this.props.user&&this.props.user.isAdmin ? <Popconfirm title="确认生效？" onConfirm={() => this.enable()}>
-                <Button className="marL15">生效</Button>
-            </Popconfirm> : null}
-
+        return <div >
+            <Table style={{ border: '1px solid #e8e8e8', borderBottom: 'none' }} rowKey="_id" dataSource={this.state.list} columns={this.columns} onChange={src => this.props.getMore(src)} pagination={{ total: this.props.count }}></Table>
+            <div style={{ marginTop: 15, marginLeft: -15, border: '1px solid #e8e8e8', border: 'none', textAlign: 'left' }}>
+                <Popconfirm title="确认取消？" onConfirm={() => this.props.fresh()}>
+                    <Button className="marL15">取消</Button>
+                </Popconfirm>
+                <Popconfirm title="确认保存？" onConfirm={() => this.save()}>
+                    <Button className="marL15" type="primary">保存</Button>
+                </Popconfirm>
+                {this.props.user && this.props.user.isAdmin ? <Popconfirm title="确认生效？" onConfirm={() => this.enable()}>
+                    <Button className="marL15" type="primary">生效</Button>
+                </Popconfirm> : null}
+            </div>
         </div>
     }
 }
