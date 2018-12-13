@@ -18,7 +18,18 @@ function parseMime(url) {
     return MIMES[extName]
 }
 let option = {
-
+    //翻译总表 批量修改
+    batchEditTransList: async (ctx, next) => {
+        let { keys, name, eName } = ctx.request.body;
+        keys.forEach(e => {
+            trans.findByIdAndUpdate(e, { name: name, eName: eName, state: false }, function (err, data) {
+                if (err) return handleError(err);
+                console.log(data);
+            })
+        })
+        ctx.response.body = { state: true }
+    },
+    //获取翻译总表
     getTransTotalList: async (ctx, next) => {
         //state 0 全部状态 1未生效  2已生效
         let { key, state, pageIdx, pageSize } = ctx.request.body, dbQuery = {}; stateCode = { "0": [true, false], 1: [false], 2: [true] }

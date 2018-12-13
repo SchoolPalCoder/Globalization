@@ -53,6 +53,7 @@ app.use(async (ctx, next) => {
 });
 app.use(serveStatic(path.join(__dirname, '../build')))
 app.use(bodyParser())
+Router.post('/batchEditTransList', api.batchEditTransList)
 Router.post('/login', api.login)
 Router.get('/branchList', api.getBranchList)
 Router.get('/moduleList', api.getModuleList)
@@ -63,7 +64,7 @@ Router.post('/getTransTotalList', api.getTransTotalList)
 Router.post('/save', api.save)
 Router.post('/enable', api.enable)
 Router.get('/getCurrentUser', api.getCurrentUser)
-Router.get('/getModuleList',api.getModuleList)
+Router.get('/getModuleList', api.getModuleList)
 Router.post('/modifyModuleText', api.modifyModuleText)
 Router.post('/upload', upload.single('file'), api.upload)
 // 解析资源类型
