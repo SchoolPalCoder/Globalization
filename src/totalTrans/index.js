@@ -33,6 +33,7 @@ class TotalTrans extends React.Component {
     getList(page = 1) {
         let params = {
             key: this.state.searchParam && this.state.searchParam.key,
+            state: 1,
             pageIdx: page,
             pageSize: 10
         }
@@ -44,9 +45,6 @@ class TotalTrans extends React.Component {
         })
     }
     columns = [{
-        title: "代码标识",
-        dataIndex: "_id.identifer"
-    }, {
         title: '中文',
         dataIndex: '_id.name',
         width: 300,

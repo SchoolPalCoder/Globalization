@@ -20,16 +20,20 @@ function parseMime(url) {
 let option = {
 
     getTransTotalList: async (ctx, next) => {
-        let { key, pageIdx, pageSize } = ctx.request.body, dbQuery = {};
-        if (key) {
-            dbQuery = {
-                name: new RegExp(key)
-            }
+        //state 0 全部状态 1未生效  2已生效
+        let { key, state, pageIdx, pageSize } = ctx.request.body, dbQuery = {}; stateCode = { "0": [true, false], 1: [false], 2: [true] }
+        dbQuery = {
+            name: key && new RegExp(key),
+            state: stateCode[state]
+        }
+        let match = { name: { $ne: null } }
+        if (dbQuery.state.length == 1) {
+            match.state = { $eq: dbQuery.state[0] }
         }
         let count,
             piplineArr = [
 
-                { $match: { name: { $ne: null } } },
+                { $match: match },
                 {
                     $group: {
                         _id: { name: "$name", eName: "$eName" },
@@ -37,10 +41,12 @@ let option = {
                         // state:{$in:[true]},
                         pathArr: { $push: { location: "$location", identifer: "$identifer", key: "$_id" } },
                         key: { $first: "$_id" },
+                        state: { $first: "$state" }
                     }
                 },
 
             ];
+
         if (key) {
             piplineArr[0] = { $match: { $or: [{ name: new RegExp(key) }, { eName: new RegExp(key) }] } }
         }
@@ -183,7 +189,7 @@ let option = {
             let arr = shell.find(filePathArr[i]).filter(file => {
                 return file.match(/index\.js$/)
             });
-            const modelPro =  arr.map(async item => {
+            const modelPro = arr.map(async item => {
                 let hasData = await appModule.find({
                     path: item.split('Myth.SIS.Web/')[1]
                 })
@@ -201,14 +207,14 @@ let option = {
         }
         //#endregion
         return Promise.all(promiseArr)
-        .then(()=>{
-            console.timeEnd("时间")
-            ctx.response.body = { msg: 'langPathStore Finish' };
-            console.log('the response status is ', ctx.status);
-            console.log('langPathStore Finish');
-        })
+            .then(() => {
+                console.timeEnd("时间")
+                ctx.response.body = { msg: 'langPathStore Finish' };
+                console.log('the response status is ', ctx.status);
+                console.log('langPathStore Finish');
+            })
         //#endregion
-        
+
     },
     //获取当前登录人
     getCurrentUser: async (ctx) => {
